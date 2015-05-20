@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["steven.murawski@gmail.com"]
   spec.summary       = 'Hyper-V Driver for Test-Kitchen'
   spec.description   = 'Hyper-V Driver for Test-Kitchen'
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/test-kitchen/kitchen-hyperv"
   spec.license       = "Apache 2"
 
   spec.files         = `git ls-files -z`.split("\x0")
