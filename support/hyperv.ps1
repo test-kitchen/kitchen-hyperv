@@ -1,11 +1,8 @@
 
 $ProgressPreference = "SilentlyContinue"
 
-<<<<<<< HEAD:lib/kitchen/support/hyperv.ps1
-function new-differencingdisk
-=======
+
 function New-DifferencingDisk
->>>>>>> rubocop'd and some tests:support/hyperv.ps1
 {
 	[cmdletbinding()]
 	param ([string[]]$Path, [string]$ParentPath)
@@ -138,12 +135,9 @@ function Get-VmDetail
 	        IpAddress = (Get-VmIP $vm)
 	      }
 	    }
-<<<<<<< HEAD:lib/kitchen/support/hyperv.ps1
-=======
 }
 
 function Get-DefaultVMSwitch
 {
-    Get-VMSwitch | Select -First 1 
->>>>>>> rubocop'd and some tests:support/hyperv.ps1
+    Get-VMSwitch | Select -First 1
 }
