@@ -35,8 +35,6 @@ driver:
   * amount of RAM to assign to each virtual machine.  Defaults to 536,870,912.
 * processor_count
   * number of virtual processors to assign to each virtual machine. Defaults to 2.
-* username
-  * Username to log into the virtual machine.  Specify a local account, without a leading '.\'.  Defaults to Administrator
 * ip_address
   * IP address for the virtual machine.  If the VM is not on a network with DHCP, this can be used to assign an IP that can be reached from the host machine.
 * vm_switch

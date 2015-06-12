@@ -38,9 +38,6 @@ module Kitchen
       default_config :parent_vhd_name
       default_config :memory_startup_bytes, 536_870_912
       default_config :processor_count, 2
-      default_config :password
-      # because test-kitchen defaults to the wrong value
-      default_config :username, 'Administrator'
       default_config :ip_address
       default_config :vm_switch
 
@@ -87,7 +84,7 @@ module Kitchen
 
       def vm_exists
         info('Checking for existing virtual machine.')
-        return false unless @state.key?(:id) || @state[:id].nil?
+        return false unless @state.key?(:id) && !@state[:id].nil?
         existing_vm = run_ps ensure_vm_running_ps
         info("Found an exising VM with an ID: #{existing_vm['Id']}")
         return true unless existing_vm.nil? || existing_vm['Id'].nil?
@@ -126,8 +123,6 @@ module Kitchen
         @state[:id] = @vm['Id']
         @state[:hostname] = @vm['IpAddress']
         @state[:vm_name] = @vm['Name']
-        @state[:password] = config[:password]
-        @state[:username] = config[:username]
       end
 
       def vm_details
