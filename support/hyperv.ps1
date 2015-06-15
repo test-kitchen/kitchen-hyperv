@@ -141,3 +141,11 @@ function Get-DefaultVMSwitch
 {
     Get-VMSwitch | Select -First 1
 }
+
+function Mount-VMISO {
+    [cmdletbinding()]
+    param($Id, $Path)
+
+    set-VMDvdDrive -VMName (get-vm -id $Id).Name -Path $Path
+
+}
