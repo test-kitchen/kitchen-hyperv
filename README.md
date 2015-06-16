@@ -26,8 +26,6 @@ driver:
   * Location of the base vhd files
 * parent_vhd_name
   * Vhd file name for the base vhd file
-* password
-  * password to use to log into the specified user account.  Default user account is Administrator
 
 ### Optional parameters:
 
@@ -39,6 +37,8 @@ driver:
   * IP address for the virtual machine.  If the VM is not on a network with DHCP, this can be used to assign an IP that can be reached from the host machine.
 * vm_switch
   * The virtual switch to attach the guest VMs.  Defaults to the first switch returned from Get-VMSwitch.
+* iso_path
+  * Path on the host to the ISO to mount on the VMs.
 
 ## Contributing
 
