@@ -126,6 +126,12 @@ module Kitchen
           Get-DefaultVMSwitch | ConvertTo-Json
         VMSWITCH
       end
+
+      def mount_vm_iso
+        <<-MOUNTISO
+          mount-vmiso -id "#{@state[:id]}" -Path #{config[:iso_path]}
+        MOUNTISO
+      end
     end
   end
 end

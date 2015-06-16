@@ -40,6 +40,7 @@ module Kitchen
       default_config :processor_count, 2
       default_config :ip_address
       default_config :vm_switch
+      default_config :iso_path
 
       include Kitchen::Driver::PowerShellScripts
 
@@ -49,6 +50,7 @@ module Kitchen
         create_new_differencing_disk
         create_virtual_machine
         update_state
+        mount_virtual_machine_iso
         instance.transport.connection(@state).wait_until_ready
         info("Hyper-V instance #{instance.to_str} created.")
       end
@@ -64,6 +66,12 @@ module Kitchen
       end
 
       private
+
+      def mount_virtual_machine_iso
+        return unless config[:iso_path]
+        info("Mounting #{config[:iso_path]}")
+        run_ps mount_vm_iso
+      end
 
       def validate_vm_settings
         return if config[:vm_switch]
