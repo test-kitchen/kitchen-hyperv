@@ -83,7 +83,7 @@ module Kitchen
         <<-NEWVM
 
           $NewVMParams = @{
-            Generation = 1
+            Generation = #{config[:vm_generation]}
             MemoryStartupBytes = #{config[:memory_startup_bytes]}
             Name = "#{instance.name}"
             Path = "#{kitchen_vm_path}"

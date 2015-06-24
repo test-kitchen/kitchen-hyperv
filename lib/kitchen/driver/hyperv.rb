@@ -41,6 +41,10 @@ module Kitchen
       default_config :ip_address
       default_config :vm_switch
       default_config :iso_path
+      default_config :vm_generation, 1
+      default_config :disk_type do |driver| 
+        File.extname(driver[:parent_vhd_name])
+      end
 
       include Kitchen::Driver::PowerShellScripts
 
@@ -74,6 +78,8 @@ module Kitchen
       end
 
       def validate_vm_settings
+        raise "Missing parent_vhd_folder" unless config[:parent_vhd_folder]
+        raise "Missing parent_vhd_name" unless config[:parent_vhd_name]
         return if config[:vm_switch]
         config[:vm_switch] = (run_ps vm_default_switch_ps)['Name']
       end
@@ -83,7 +89,7 @@ module Kitchen
       end
 
       def differencing_disk_path
-        @differencing_disk_path ||= File.join(kitchen_vm_path, 'diff.vhd')
+        @differencing_disk_path ||= File.join(kitchen_vm_path, "diff" + "#{config[:disk_type]}")
       end
 
       def parent_vhd_path

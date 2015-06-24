@@ -52,9 +52,10 @@ function New-KitchenVM
 	    $ProcessorCount
 	  )
 	  $null = $psboundparameters.remove('ProcessorCount')
-	  new-vm @psboundparameters |
-	    Set-Vm -ProcessorCount $ProcessorCount -passthru |
-	    Start-Vm -passthru |
+	  $vm = new-vm @psboundparameters |
+	    Set-Vm -ProcessorCount $ProcessorCount -passthru
+    $vm | Set-VMMemory -DynamicMemoryEnabled $false 
+	  $vm | Start-Vm -passthru |
 	    foreach {
 	      $vm = $_
 	      do {
@@ -139,7 +140,7 @@ function Get-VmDetail
 
 function Get-DefaultVMSwitch
 {
-    Get-VMSwitch | Select -First 1
+    Get-VMSwitch | Select -First 1 | Select Name, Id
 }
 
 function Mount-VMISO {
