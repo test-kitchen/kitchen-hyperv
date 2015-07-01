@@ -27,8 +27,17 @@ module Kitchen
         Base64.strict_encode64(encoded_script)
       end
 
+      def is_64bit?
+        os_arch = ENV['PROCESSOR_ARCHITEW6432'] || ENV['PROCESSOR_ARCHITECTURE']
+        os_arch == 'AMD64'
+      end
+
       def powershell_64_bit
-        'c:\windows\sysnative\windowspowershell\v1.0\powershell.exe'
+        if is_64bit?
+          'c:\windows\system32\windowspowershell\v1.0\powershell.exe'
+        else
+          'c:\windows\sysnative\windowspowershell\v1.0\powershell.exe'
+        end
       end
 
       def wrap_command(script)
