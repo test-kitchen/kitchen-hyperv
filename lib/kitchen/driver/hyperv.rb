@@ -84,10 +84,11 @@ module Kitchen
         raise "Missing parent_vhd_folder" unless config[:parent_vhd_folder]
         raise "Missing parent_vhd_name" unless config[:parent_vhd_name]
         if config[:dynamic_memory]
+          startup_bytes = config[:memory_startup_bytes]
           min = config[:dynamic_memory_min_bytes]
           max = config[:dynamic_memory_max_bytes]
-          memory_valid = config[:memory_startup_bytes].between?(min, max)
-          raise "memory_startup_bytes must fall within dynamic memory range" unless memory_valid
+          memory_valid = startup_bytes.between?(min, max)
+          raise "memory_startup_bytes (#{startup_bytes}) must fall within dynamic memory range (#{min}-#{max})" unless memory_valid
         end
         return if config[:vm_switch]
         config[:vm_switch] = (run_ps vm_default_switch_ps)['Name']
