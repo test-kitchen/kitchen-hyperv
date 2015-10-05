@@ -99,6 +99,9 @@ module Kitchen
             VHDPath = "#{differencing_disk_path}"
             SwitchName = "#{config[:vm_switch]}"
             ProcessorCount = #{config[:processor_count]}
+            UseDynamicMemory = "#{config[:dynamic_memory]}"
+            DynamicMemoryMinBytes = #{config[:dynamic_memory_min_bytes]}
+            DynamicMemoryMaxBytes = #{config[:dynamic_memory_max_bytes]}
           }
           New-KitchenVM @NewVMParams | ConvertTo-Json
         NEWVM

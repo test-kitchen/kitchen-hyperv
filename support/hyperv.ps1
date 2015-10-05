@@ -49,12 +49,20 @@ function New-KitchenVM
 	    $Path,
 	    $VHDPath,
 	    $SwitchName,
-	    $ProcessorCount
+	    $ProcessorCount,
+		$UseDynamicMemory,
+		$DynamicMemoryMinBytes,
+		$DynamicMemoryMaxBytes
 	  )
 	  $null = $psboundparameters.remove('ProcessorCount')
+	  $null = $psboundparameters.remove('UseDynamicMemory')
+	  $null = $psboundparameters.remove('DynamicMemoryMinBytes')
+	  $null = $psboundparameters.remove('DynamicMemoryMaxBytes')
+	  $UseDynamicMemory = [Convert]::ToBoolean($UseDynamicMemory)
+
 	  $vm = new-vm @psboundparameters |
 	    Set-Vm -ProcessorCount $ProcessorCount -passthru
-    $vm | Set-VMMemory -DynamicMemoryEnabled $false 
+	  $vm | Set-VMMemory -DynamicMemoryEnabled $UseDynamicMemory -MinimumBytes $DynamicMemoryMinBytes -MaximumBytes $DynamicMemoryMaxBytes
 	  $vm | Start-Vm -passthru |
 	    foreach {
 	      $vm = $_

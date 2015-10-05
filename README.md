@@ -33,6 +33,10 @@ driver:
   * amount of RAM to assign to each virtual machine.  Defaults to 536,870,912.
 * processor_count
   * number of virtual processors to assign to each virtual machine. Defaults to 2.
+* dynamic_memory
+  * if true, the amount of memory allocated to a virtual machine is adjusted by Hyper-V dynamically. Defaults to false.
+* dynamic_memory_min_bytes / dynamic_memory_max_bytes
+  * The minimum and maximum amount of memory Hyper-V will allocate to a virtual machine if dynamic_memory is enabled. Defaults to 536,870,912 and 2,147,483,648 (512MB-2GB)
 * ip_address
   * IP address for the virtual machine.  If the VM is not on a network with DHCP, this can be used to assign an IP that can be reached from the host machine.
 * vm_switch
