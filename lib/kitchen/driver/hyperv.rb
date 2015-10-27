@@ -42,7 +42,7 @@ module Kitchen
       default_config :vm_switch
       default_config :iso_path
       default_config :vm_generation, 1
-      default_config :disk_type do |driver| 
+      default_config :disk_type do |driver|
         File.extname(driver[:parent_vhd_name])
       end
 
@@ -56,6 +56,7 @@ module Kitchen
         update_state
         mount_virtual_machine_iso
         instance.transport.connection(@state).wait_until_ready
+        copy_vm_files
         info("Hyper-V instance #{instance.to_str} created.")
       end
 
@@ -100,8 +101,9 @@ module Kitchen
         info('Checking for existing virtual machine.')
         return false unless @state.key?(:id) && !@state[:id].nil?
         existing_vm = run_ps ensure_vm_running_ps
+        return false if existing_vm.nil? || existing_vm['Id'].nil?
         info("Found an exising VM with an ID: #{existing_vm['Id']}")
-        return true unless existing_vm.nil? || existing_vm['Id'].nil?
+        return true
         #fail('Failed to start existing VM.')
       end
 
@@ -130,6 +132,16 @@ module Kitchen
         new_vm_object = run_ps new_vm_ps
         @state[:id] = new_vm_object['Id']
         info("Created virtual machine for #{instance.name}.")
+      end
+      
+      def copy_vm_files
+        
+        return if config[:copy_vm_files].nil?
+        info("Copying files to virtual machine")
+        config[:copy_vm_files].each do |file_info|
+          run_ps copy_vm_file_ps(file_info[:source], file_info[:dest])
+        end
+        info("Copied files to virtual machine")
       end
 
       def update_state
