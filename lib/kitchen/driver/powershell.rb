@@ -141,6 +141,41 @@ module Kitchen
           mount-vmiso -id "#{@state[:id]}" -Path #{config[:iso_path]}
         MOUNTISO
       end
+      
+      def copy_vm_file_ps(source, dest)
+        <<-FILECOPY
+          Function CopyFile ($VM, [string]$SourcePath, [string]$DestPath) {
+              #Write-Host "Copying file to VM - Source: $SourcePath Destination $DestPath"
+              $VM | Copy-VMFile -SourcePath $SourcePath -DestinationPath $DestPath -CreateFullPath -FileSource Host -Force
+          }
+          
+          $sourceLocation = '#{source}'
+          $destinationLocation = '#{dest}'
+          $vmId = '#{@state[:id]}'
+          If (Test-Path $sourceLocation) {
+              $vm = Get-VM -ID $vmId
+              $service = 'Guest Service Interface'
+              
+              If ((Get-VMIntegrationService -Name $service -VM $vm).Enabled -ne $true) {
+                  Enable-VMIntegrationService -Name $service -VM $vm
+                  Start-Sleep -Seconds 3
+              }
+              
+              If ((Get-Item $sourceLocation) -is [System.IO.DirectoryInfo]) {
+                  ForEach ($item in (Get-ChildItem -Path $sourceLocation -File)) {
+                      $destFullPath = (Join-Path $destinationLocation $item.Name)
+                      CopyFile $vm $item.FullName $destFullPath
+                  }
+              }
+              Else {
+                CopyFile $vm $sourceLocation $destinationLocation
+              }
+          }
+          else {
+              Write-Error "Source file path does not exist: $sourceLocation"
+          } 
+        FILECOPY
+      end
     end
   end
 end
