@@ -36,6 +36,7 @@ module Kitchen
 
       default_config :parent_vhd_folder
       default_config :parent_vhd_name
+      default_config :memory_startup, nil
       default_config :memory_startup_bytes, 536_870_912
       default_config :processor_count, 2
       default_config :ip_address
@@ -135,7 +136,6 @@ module Kitchen
       end
       
       def copy_vm_files
-        
         return if config[:copy_vm_files].nil?
         info("Copying files to virtual machine")
         config[:copy_vm_files].each do |file_info|

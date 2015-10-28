@@ -39,6 +39,14 @@ module Kitchen
           'c:\windows\sysnative\windowspowershell\v1.0\powershell.exe'
         end
       end
+      
+      def get_memory_config
+        if config[:memory_startup].nil?
+          config[:memory_startup_bytes]
+        else
+          config[:memory_startup] * 1048576
+        end
+      end
 
       def wrap_command(script)
         base_script_path = File.join(File.dirname(__FILE__), '/../../../support/hyperv.ps1')
@@ -93,7 +101,7 @@ module Kitchen
 
           $NewVMParams = @{
             Generation = #{config[:vm_generation]}
-            MemoryStartupBytes = #{config[:memory_startup_bytes]}
+            MemoryStartupBytes = #{get_memory_config}
             Name = "#{instance.name}"
             Path = "#{kitchen_vm_path}"
             VHDPath = "#{differencing_disk_path}"
