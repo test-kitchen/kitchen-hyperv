@@ -42,7 +42,7 @@ module Kitchen
       default_config :vm_switch
       default_config :iso_path
       default_config :vm_generation, 1
-      default_config :disk_type do |driver| 
+      default_config :disk_type do |driver|
         File.extname(driver[:parent_vhd_name])
       end
 
@@ -100,8 +100,9 @@ module Kitchen
         info('Checking for existing virtual machine.')
         return false unless @state.key?(:id) && !@state[:id].nil?
         existing_vm = run_ps ensure_vm_running_ps
+        return false if existing_vm.nil? || existing_vm['Id'].nil?
         info("Found an exising VM with an ID: #{existing_vm['Id']}")
-        return true unless existing_vm.nil? || existing_vm['Id'].nil?
+        return true
         #fail('Failed to start existing VM.')
       end
 
