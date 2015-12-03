@@ -1,14 +1,14 @@
 #requires -Version 2 -Modules Hyper-V
 
 #implicitly import hyperv module to avoid powercli cmdlets
-if((Get-Module -Name hyperv) -ne $null)
+if((Get-Module -Name 'hyper-v') -ne $null)
 {
-    Remove-Module -Name hyperv
-    Import-Module -Name hyperv
+    Remove-Module -Name hyper-v
+    Import-Module -Name hyper-v
 }
 else
 {
-    Import-Module -Name hyperv
+    Import-Module -Name hyper-v
 }
 
 $ProgressPreference = 'SilentlyContinue'
@@ -84,7 +84,7 @@ function New-KitchenVM
     else {
       $vm | Set-VMMemory -DynamicMemoryEnabled $false
     }
-	  
+
 	  $vm | Start-Vm -passthru |
 	    foreach {
 	      $vm = $_
@@ -117,17 +117,17 @@ Function Set-VMNetworkConfiguration
     )
 
     $vm = Get-WmiObject -Namespace 'root\virtualization\v2' -Class 'Msvm_ComputerSystem' | Where-Object {
-        $_.ElementName -eq $NetworkAdapter.VMName 
+        $_.ElementName -eq $NetworkAdapter.VMName
     }
     $VMSettings = $vm.GetRelated('Msvm_VirtualSystemSettingData') | Where-Object {
-        $_.VirtualSystemType -eq 'Microsoft:Hyper-V:System:Realized' 
+        $_.VirtualSystemType -eq 'Microsoft:Hyper-V:System:Realized'
     }
     $VMNetAdapters = $VMSettings.GetRelated('Msvm_SyntheticEthernetPortSettingData')
 
     $NetworkSettings = @()
-    foreach ($NetAdapter in $VMNetAdapters) 
+    foreach ($NetAdapter in $VMNetAdapters)
     {
-        if ($NetAdapter.Address -eq $NetworkAdapter.MacAddress) 
+        if ($NetAdapter.Address -eq $NetworkAdapter.MacAddress)
         {
             $NetworkSettings = $NetworkSettings + $NetAdapter.GetRelated('Msvm_GuestNetworkAdapterConfiguration')
         }
@@ -142,17 +142,17 @@ Function Set-VMNetworkConfiguration
     $Service = Get-WmiObject -Class 'Msvm_VirtualSystemManagementService' -Namespace 'root\virtualization\v2'
     $setIP = $Service.SetGuestNetworkAdapterConfiguration($vm, $NetworkSettings[0].GetText(1))
 
-    if ($setIP.ReturnValue -eq 4096) 
+    if ($setIP.ReturnValue -eq 4096)
     {
         $job = [WMI]$setIP.job
 
-        while ($job.JobState -eq 3 -or $job.JobState -eq 4) 
+        while ($job.JobState -eq 3 -or $job.JobState -eq 4)
         {
             Start-Sleep 1
             $job = [WMI]$setIP.job
         }
 
-        if ($job.JobState -ne 7) 
+        if ($job.JobState -ne 7)
         {
             $job.GetError()
         }
@@ -168,7 +168,7 @@ function Get-VmDetail
     Get-VM -Id $Id |
     ForEach-Object {
         $vm = $_
-        do 
+        do
         {
             Start-Sleep -Seconds 1
         }
@@ -189,7 +189,7 @@ function Get-DefaultVMSwitch
     Select-Object Name, Id
 }
 
-function Mount-VMISO 
+function Mount-VMISO
 {
     [cmdletbinding()]
     param($Id, $Path)
