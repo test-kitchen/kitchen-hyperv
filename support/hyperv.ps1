@@ -194,10 +194,5 @@ function Mount-VMISO
     [cmdletbinding()]
     param($Id, $Path)
 
-<<<<<<< HEAD
     set-VMDvdDrive -VMName (Get-VM -Id $Id).Name -Path $Path
-=======
-    set-VMDvdDrive -VMName (get-vm -id $Id).Name -Path $Path
-
->>>>>>> brantb/dynamic-memory
 }

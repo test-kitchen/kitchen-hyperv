@@ -1,3 +1,7 @@
+# 0.1.9 / 12-03-2015
+
+Missed a merge conflict.
+
 # 0.1.8 / 12-03-2015
 
 * [PR #15](https://github.com/test-kitchen/kitchen-hyperv/pull/15) : Dynamic Memory support
