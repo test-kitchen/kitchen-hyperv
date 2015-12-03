@@ -87,6 +87,7 @@ function New-KitchenVM
 
 function Get-VmIP($vm)
 {
+    start-sleep -seconds 10
     $vm.networkadapters.ipaddresses |
     Where-Object {
         $_ -match '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
