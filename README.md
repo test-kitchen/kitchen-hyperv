@@ -44,6 +44,17 @@ driver:
 * disk_type
   * The type of virtual disk to create, .VHD or .VHDX.  Defaults to the file extension of the parent virtual hard drive.
 
+## Image Configuration
+
+ The following changes need to be made to a Windows image that is going to be used for testing.  This is not an exhaustive list and, your milage may vary.
+
+#### WinRM
+
+```powershell
+winrm set winrm/config/client/auth @{Basic="true"}
+winrm set winrm/config/service/auth @{Basic="true"}
+winrm set winrm/config/service @{AllowUnencrypted="true"}
+ ```
 ## Contributing
 
 1. Fork it ( https://github.com/[my-github-username]/kitchen-hyperv/fork )
