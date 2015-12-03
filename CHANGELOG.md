@@ -1,3 +1,10 @@
+# 0.1.10 / 12-03-2015
+
+I really need to add some tests to this project. ;)
+
+* [PR #21](https://github.com/test-kitchen/kitchen-hyperv/pull/21) : Wrong module name
+
+
 # 0.1.9 / 12-03-2015
 
 Missed a merge conflict.
