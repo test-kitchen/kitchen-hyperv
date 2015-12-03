@@ -59,30 +59,41 @@ function New-KitchenVM
 {
     [cmdletbinding()]
     param (
-        $Generation = 1,
-        $MemoryStartupBytes,
-        $Name,
-        $Path,
-        $VHDPath,
-        $SwitchName,
-        $ProcessorCount
-    )
-    $null = $psboundparameters.remove('ProcessorCount')
-    $vm = New-VM @psboundparameters |
-    Set-VM -ProcessorCount $ProcessorCount -passthru
-    $vm | Set-VMMemory -DynamicMemoryEnabled $false 
-    $vm |
-    Start-VM -passthru |
-    ForEach-Object {
-        $vm = $_
-        do 
-        {
-            Start-Sleep -Seconds 2
-        }
-        while ($vm.state -notlike 'Running')
-        $vm
-    } |
-    Select-Object Name, Id, State
+      $Generation = 1,
+	    $MemoryStartupBytes,
+	    $Name,
+	    $Path,
+	    $VHDPath,
+	    $SwitchName,
+	    $ProcessorCount,
+      $UseDynamicMemory,
+      $DynamicMemoryMinBytes,
+      $DynamicMemoryMaxBytes
+	  )
+	  $null = $psboundparameters.remove('ProcessorCount')
+	  $null = $psboundparameters.remove('UseDynamicMemory')
+	  $null = $psboundparameters.remove('DynamicMemoryMinBytes')
+	  $null = $psboundparameters.remove('DynamicMemoryMaxBytes')
+	  $UseDynamicMemory = [Convert]::ToBoolean($UseDynamicMemory)
+
+	  $vm = new-vm @psboundparameters |
+	    Set-Vm -ProcessorCount $ProcessorCount -passthru
+    if ($UseDynamicMemory) {
+      $vm | Set-VMMemory -DynamicMemoryEnabled $true -MinimumBytes $DynamicMemoryMinBytes -MaximumBytes $DynamicMemoryMaxBytes
+    }
+    else {
+      $vm | Set-VMMemory -DynamicMemoryEnabled $false
+    }
+	  
+	  $vm | Start-Vm -passthru |
+	    foreach {
+	      $vm = $_
+	      do {
+	        start-sleep -seconds 2
+	      } while ($vm.state -notlike 'Running')
+	      $vm
+	    } |
+	    select Name, Id, State
 }
 
 function Get-VmIP($vm)
@@ -183,5 +194,10 @@ function Mount-VMISO
     [cmdletbinding()]
     param($Id, $Path)
 
+<<<<<<< HEAD
     set-VMDvdDrive -VMName (Get-VM -Id $Id).Name -Path $Path
+=======
+    set-VMDvdDrive -VMName (get-vm -id $Id).Name -Path $Path
+
+>>>>>>> brantb/dynamic-memory
 }

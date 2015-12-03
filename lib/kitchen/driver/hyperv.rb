@@ -37,6 +37,9 @@ module Kitchen
       default_config :parent_vhd_folder
       default_config :parent_vhd_name
       default_config :memory_startup_bytes, 536_870_912
+      default_config :dynamic_memory_min_bytes, 536_870_912
+      default_config :dynamic_memory_max_bytes, 2_147_483_648
+      default_config :dynamic_memory, false
       default_config :processor_count, 2
       default_config :ip_address
       default_config :vm_switch
@@ -81,6 +84,13 @@ module Kitchen
       def validate_vm_settings
         raise "Missing parent_vhd_folder" unless config[:parent_vhd_folder]
         raise "Missing parent_vhd_name" unless config[:parent_vhd_name]
+        if config[:dynamic_memory]
+          startup_bytes = config[:memory_startup_bytes]
+          min = config[:dynamic_memory_min_bytes]
+          max = config[:dynamic_memory_max_bytes]
+          memory_valid = startup_bytes.between?(min, max)
+          raise "memory_startup_bytes (#{startup_bytes}) must fall within dynamic memory range (#{min}-#{max})" unless memory_valid
+        end
         return if config[:vm_switch]
         config[:vm_switch] = (run_ps vm_default_switch_ps)['Name']
       end
