@@ -17,6 +17,6 @@
 
 module Kitchen
   module Driver
-      HYPERV_VERSION = '0.1.8'
+      HYPERV_VERSION = '0.1.9.dev'
   end
 end
