@@ -56,6 +56,7 @@ module Kitchen
         update_state
         mount_virtual_machine_iso
         instance.transport.connection(@state).wait_until_ready
+        copy_vm_files
         info("Hyper-V instance #{instance.to_str} created.")
       end
 
@@ -131,6 +132,16 @@ module Kitchen
         new_vm_object = run_ps new_vm_ps
         @state[:id] = new_vm_object['Id']
         info("Created virtual machine for #{instance.name}.")
+      end
+      
+      def copy_vm_files
+        
+        return if config[:copy_vm_files].nil?
+        info("Copying files to virtual machine")
+        config[:copy_vm_files].each do |file_info|
+          run_ps copy_vm_file_ps(file_info[:source], file_info[:dest])
+        end
+        info("Copied files to virtual machine")
       end
 
       def update_state
