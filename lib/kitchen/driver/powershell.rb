@@ -45,7 +45,7 @@ module Kitchen
         debug("Loading functions from #{base_script_path}")
         new_script = ". #{base_script_path}; " << script
         debug("Wrapped script: #{new_script}")
-        "#{powershell_64_bit} -encodedcommand #{encode_command new_script} -outputformat Text"
+        "#{powershell_64_bit} -noprofile -encodedcommand #{encode_command new_script} -outputformat Text"
       end
 
       # Convenience method to run a powershell command locally.
