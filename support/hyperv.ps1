@@ -113,6 +113,8 @@ Function Set-VMNetworkConfiguration
         [parameter(valuefrompipeline)]
         [object]$NetworkAdapter,
         [String[]]$IPAddress = @(),
+        [String[]]$Gateway = @(),
+        [String[]]$DNSServers = @(),
         [String[]]$Subnet = @()
     )
 
@@ -134,6 +136,8 @@ Function Set-VMNetworkConfiguration
     }
 
     $NetworkSettings[0].IPAddresses = $IPAddress
+    $NetworkSettings[0].DefaultGateways = $Gateway
+    $NetworkSettings[0].DNSServers = $DNSServers
     $NetworkSettings[0].Subnets = $Subnet
     $NetworkSettings[0].ProtocolIFType = 4096
     $NetworkSettings[0].DHCPEnabled = $false

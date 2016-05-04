@@ -128,7 +128,10 @@ module Kitchen
         <<-VMIP
 
           (Get-VM -id "#{@state[:id]}").NetworkAdapters |
-            Set-VMNetworkConfiguration -ipaddress "#{config[:ip_address]}" -subnet 255.255.255.0 |
+            Set-VMNetworkConfiguration -ipaddress "#{config[:ip_address]}" `
+              -subnet "#{config[:subnet]}" `
+              -gateway "#{config[:gateway]}" `
+              -dnsservers #{ruby_array_to_ps_array(config[:dns_servers])} |
             ConvertTo-Json
         VMIP
       end
@@ -178,6 +181,13 @@ module Kitchen
               Write-Error "Source file path does not exist: $sourceLocation"
           } 
         FILECOPY
+      end
+
+      private
+
+      def ruby_array_to_ps_array(list)
+        return "@()" if list.nil? || list.empty?
+        list.to_s.tr('[]','()').prepend('@')
       end
     end
   end
