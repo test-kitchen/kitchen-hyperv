@@ -42,6 +42,9 @@ module Kitchen
       default_config :dynamic_memory, false
       default_config :processor_count, 2
       default_config :ip_address
+      default_config :gateway
+      default_config :dns_servers
+      default_config :subnet, '255.255.255.0'
       default_config :vm_switch
       default_config :iso_path
       default_config :vm_generation, 1

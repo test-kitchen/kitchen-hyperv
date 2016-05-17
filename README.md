@@ -39,6 +39,12 @@ driver:
   * The minimum and maximum amount of memory Hyper-V will allocate to a virtual machine if dynamic_memory is enabled. Defaults to 536,870,912 and 2,147,483,648 (512MB-2GB)
 * ip_address
   * IP address for the virtual machine.  If the VM is not on a network with DHCP, this can be used to assign an IP that can be reached from the host machine.
+* subnet
+  * The subnet of the virtual machine. Defaults to `255.255.255.0`
+* gateway
+  * The default gateway of the virtual machine.
+* dns_servers
+  * A list of DNS Servers that can be reached on the virtual network.
 * vm_switch
   * The virtual switch to attach the guest VMs.  Defaults to the first switch returned from Get-VMSwitch.
 * iso_path
