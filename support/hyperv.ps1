@@ -68,12 +68,14 @@ function New-KitchenVM
 	    $ProcessorCount,
       $UseDynamicMemory,
       $DynamicMemoryMinBytes,
-      $DynamicMemoryMaxBytes
+      $DynamicMemoryMaxBytes,
+      $boot_iso_path
 	  )
 	  $null = $psboundparameters.remove('ProcessorCount')
 	  $null = $psboundparameters.remove('UseDynamicMemory')
 	  $null = $psboundparameters.remove('DynamicMemoryMinBytes')
 	  $null = $psboundparameters.remove('DynamicMemoryMaxBytes')
+	  $null = $psboundparameters.remove('boot_iso_path')
 	  $UseDynamicMemory = [Convert]::ToBoolean($UseDynamicMemory)
 
 	  $vm = new-vm @psboundparameters |
@@ -84,7 +86,7 @@ function New-KitchenVM
     else {
       $vm | Set-VMMemory -DynamicMemoryEnabled $false
     }
-
+      Mount-VMISO -Id $vm.Id -Path $boot_iso_path
 	  $vm | Start-Vm -passthru |
 	    foreach {
 	      $vm = $_
