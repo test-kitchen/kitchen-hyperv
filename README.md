@@ -49,6 +49,8 @@ driver:
   * The virtual switch to attach the guest VMs.  Defaults to the first switch returned from Get-VMSwitch.
 * iso_path
   * Path on the host to the ISO to mount on the VMs.
+* boot_iso_path
+  * Path on the host to the ISO to mount before starting the VMs.
 * vm_generation
   * The generation for the hyper-v VM.  Defaults to 1.
 * disk_type
