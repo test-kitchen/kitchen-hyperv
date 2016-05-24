@@ -68,8 +68,14 @@ module Kitchen
         sh = Mixlib::ShellOut.new(cmd, options)
         sh.run_command
         debug("Local Command END #{Util.duration(sh.execution_time)}")
-        fail "Failed: #{sh.stderr}" if sh.error?
-        JSON.parse(sh.stdout) if sh.stdout.length > 2
+        if sh.error?
+          error("Failed to execute command.")
+          error(sh.stdout)
+          error(sh.stderr)
+          raise "Failed: #{sh.stderr}"
+        else
+          JSON.parse(sh.stdout) if sh.stdout.length > 2
+        end
       end
       # rubocop:enable Metrics/AbcSize
 
