@@ -85,9 +85,17 @@ module Kitchen
         run_ps mount_vm_iso
       end
 
+      def vhd_folder?
+        config[:parent_vhd_folder] && Dir.exist?(config[:parent_vhd_folder])
+      end
+
+      def vhd?
+        config[:parent_vhd_name] && File.exist?(parent_vhd_path)
+      end
+
       def validate_vm_settings
-        raise "Missing parent_vhd_folder" unless config[:parent_vhd_folder]
-        raise "Missing parent_vhd_name" unless config[:parent_vhd_name]
+        raise "Missing parent_vhd_folder" unless vhd_folder?
+        raise "Missing parent_vhd_name" unless vhd?
         if config[:dynamic_memory]
           startup_bytes = config[:memory_startup_bytes]
           min = config[:dynamic_memory_min_bytes]
@@ -102,11 +110,11 @@ module Kitchen
       def kitchen_vm_path
         @kitchen_vm_path ||= File.join(config[:kitchen_root], ".kitchen/#{instance.name}")
       end
-      
+
       def boot_iso_path
         @boot_iso_path ||= config[:boot_iso_path]
       end
-      
+
       def differencing_disk_path
         @differencing_disk_path ||= File.join(kitchen_vm_path, "diff" + "#{config[:disk_type]}")
       end
@@ -121,8 +129,7 @@ module Kitchen
         existing_vm = run_ps ensure_vm_running_ps
         return false if existing_vm.nil? || existing_vm['Id'].nil?
         info("Found an exising VM with an ID: #{existing_vm['Id']}")
-        return true
-        #fail('Failed to start existing VM.')
+        true
       end
 
       def remove_differencing_disk
@@ -151,9 +158,8 @@ module Kitchen
         @state[:id] = new_vm_object['Id']
         info("Created virtual machine for #{instance.name}.")
       end
-      
+
       def copy_vm_files
-        
         return if config[:copy_vm_files].nil?
         info("Copying files to virtual machine")
         config[:copy_vm_files].each do |file_info|
