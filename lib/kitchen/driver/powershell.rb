@@ -102,6 +102,7 @@ module Kitchen
             UseDynamicMemory = "#{config[:dynamic_memory]}"
             DynamicMemoryMinBytes = #{config[:dynamic_memory_min_bytes]}
             DynamicMemoryMaxBytes = #{config[:dynamic_memory_max_bytes]}
+            boot_iso_path = "#{boot_iso_path}"
           }
           New-KitchenVM @NewVMParams | ConvertTo-Json
         NEWVM

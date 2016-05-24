@@ -47,6 +47,7 @@ module Kitchen
       default_config :subnet, '255.255.255.0'
       default_config :vm_switch
       default_config :iso_path
+      default_config :boot_iso_path
       default_config :vm_generation, 1
       default_config :disk_type do |driver|
         File.extname(driver[:parent_vhd_name])
@@ -101,7 +102,11 @@ module Kitchen
       def kitchen_vm_path
         @kitchen_vm_path ||= File.join(config[:kitchen_root], ".kitchen/#{instance.name}")
       end
-
+      
+      def boot_iso_path
+        @boot_iso_path ||= config[:boot_iso_path]
+      end
+      
       def differencing_disk_path
         @differencing_disk_path ||= File.join(kitchen_vm_path, "diff" + "#{config[:disk_type]}")
       end
