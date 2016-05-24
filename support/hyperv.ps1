@@ -86,7 +86,9 @@ function New-KitchenVM
     else {
       $vm | Set-VMMemory -DynamicMemoryEnabled $false
     }
-      Mount-VMISO -Id $vm.Id -Path $boot_iso_path
+      if (-not [string]::IsNullOrEmpty($boot_iso_path)) {
+        Mount-VMISO -Id $vm.Id -Path $boot_iso_path
+      }
 	  $vm | Start-Vm -passthru |
 	    foreach {
 	      $vm = $_
