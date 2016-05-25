@@ -17,7 +17,14 @@ $ProgressPreference = 'SilentlyContinue'
 function New-DifferencingDisk
 {
     [cmdletbinding()]
-    param ([string[]]$Path, [string]$ParentPath)
+    param (
+        [parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string[]]$Path,
+        [parameter(Mandatory)]        
+        [ValidateNotNullOrEmpty()] 
+        [string]$ParentPath
+    )
     if (-not (Test-Path $Path))
     {
         $null = new-vhd @psboundparameters -Differencing
@@ -68,12 +75,14 @@ function New-KitchenVM
 	    $ProcessorCount,
       $UseDynamicMemory,
       $DynamicMemoryMinBytes,
-      $DynamicMemoryMaxBytes
+      $DynamicMemoryMaxBytes,
+      $boot_iso_path
 	  )
 	  $null = $psboundparameters.remove('ProcessorCount')
 	  $null = $psboundparameters.remove('UseDynamicMemory')
 	  $null = $psboundparameters.remove('DynamicMemoryMinBytes')
 	  $null = $psboundparameters.remove('DynamicMemoryMaxBytes')
+	  $null = $psboundparameters.remove('boot_iso_path')
 	  $UseDynamicMemory = [Convert]::ToBoolean($UseDynamicMemory)
 
 	  $vm = new-vm @psboundparameters |
@@ -84,7 +93,9 @@ function New-KitchenVM
     else {
       $vm | Set-VMMemory -DynamicMemoryEnabled $false
     }
-
+      if (-not [string]::IsNullOrEmpty($boot_iso_path)) {
+        Mount-VMISO -Id $vm.Id -Path $boot_iso_path
+      }
 	  $vm | Start-Vm -passthru |
 	    foreach {
 	      $vm = $_
@@ -188,9 +199,11 @@ function Get-VmDetail
 
 function Get-DefaultVMSwitch
 {
-    Get-VMSwitch |
-    Select-Object -First 1 |
-    Select-Object Name, Id
+    [CmdletBinding()]
+    param ($Name)
+    Get-VMSwitch @PSBoundParameters |
+        Select-Object -First 1 |
+        Select-Object Name, Id
 }
 
 function Mount-VMISO

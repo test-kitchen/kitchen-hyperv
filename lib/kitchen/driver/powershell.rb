@@ -45,7 +45,8 @@ module Kitchen
         debug("Loading functions from #{base_script_path}")
         new_script = ". #{base_script_path}; " << script
         debug("Wrapped script: #{new_script}")
-        "#{powershell_64_bit} -noprofile -encodedcommand #{encode_command new_script} -outputformat Text"
+        "#{powershell_64_bit} -noprofile -executionpolicy bypass" \
+        " -encodedcommand #{encode_command new_script} -outputformat Text"
       end
 
       # Convenience method to run a powershell command locally.
@@ -62,16 +63,14 @@ module Kitchen
         execute_command wrapped_command, options
       end
 
-      # rubocop:disable Metrics/AbcSize
       def execute_command(cmd, options = {})
         debug("#Local Command BEGIN (#{cmd})")
         sh = Mixlib::ShellOut.new(cmd, options)
         sh.run_command
         debug("Local Command END #{Util.duration(sh.execution_time)}")
-        fail "Failed: #{sh.stderr}" if sh.error?
+        raise "Failed: #{sh.stderr}" if sh.error?
         JSON.parse(sh.stdout) if sh.stdout.length > 2
       end
-      # rubocop:enable Metrics/AbcSize
 
       def new_differencing_disk_ps
         <<-DIFF
@@ -87,7 +86,6 @@ module Kitchen
         RUNNING
       end
 
-      # rubocop:disable Metrics/MethodLength
       def new_vm_ps
         <<-NEWVM
 
@@ -102,11 +100,11 @@ module Kitchen
             UseDynamicMemory = "#{config[:dynamic_memory]}"
             DynamicMemoryMinBytes = #{config[:dynamic_memory_min_bytes]}
             DynamicMemoryMaxBytes = #{config[:dynamic_memory_max_bytes]}
+            boot_iso_path = "#{boot_iso_path}"
           }
           New-KitchenVM @NewVMParams | ConvertTo-Json
         NEWVM
       end
-      # rubocop:enable Metrics/MethodLength
 
       def vm_details_ps
         <<-DETAILS
@@ -138,7 +136,7 @@ module Kitchen
 
       def vm_default_switch_ps
         <<-VMSWITCH
-          Get-DefaultVMSwitch | ConvertTo-Json
+          Get-DefaultVMSwitch #{config[:vm_switch]} | ConvertTo-Json
         VMSWITCH
       end
 
@@ -147,26 +145,27 @@ module Kitchen
           mount-vmiso -id "#{@state[:id]}" -Path #{config[:iso_path]}
         MOUNTISO
       end
-      
+
       def copy_vm_file_ps(source, dest)
         <<-FILECOPY
           Function CopyFile ($VM, [string]$SourcePath, [string]$DestPath) {
-              #Write-Host "Copying file to VM - Source: $SourcePath Destination $DestPath"
-              $VM | Copy-VMFile -SourcePath $SourcePath -DestinationPath $DestPath -CreateFullPath -FileSource Host -Force
+              $p = @{ CreateFullPath = $true ; FileSource = 'Host'; Force = $true }
+              $VM |
+                Copy-VMFile -SourcePath $SourcePath -DestinationPath $DestPath @p
           }
-          
+
           $sourceLocation = '#{source}'
           $destinationLocation = '#{dest}'
           $vmId = '#{@state[:id]}'
           If (Test-Path $sourceLocation) {
               $vm = Get-VM -ID $vmId
               $service = 'Guest Service Interface'
-              
+
               If ((Get-VMIntegrationService -Name $service -VM $vm).Enabled -ne $true) {
                   Enable-VMIntegrationService -Name $service -VM $vm
                   Start-Sleep -Seconds 3
               }
-              
+
               If ((Get-Item $sourceLocation) -is [System.IO.DirectoryInfo]) {
                   ForEach ($item in (Get-ChildItem -Path $sourceLocation -File)) {
                       $destFullPath = (Join-Path $destinationLocation $item.Name)
@@ -179,7 +178,7 @@ module Kitchen
           }
           else {
               Write-Error "Source file path does not exist: $sourceLocation"
-          } 
+          }
         FILECOPY
       end
 

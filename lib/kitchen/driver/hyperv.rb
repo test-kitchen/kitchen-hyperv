@@ -47,6 +47,7 @@ module Kitchen
       default_config :subnet, '255.255.255.0'
       default_config :vm_switch
       default_config :iso_path
+      default_config :boot_iso_path
       default_config :vm_generation, 1
       default_config :disk_type do |driver|
         File.extname(driver[:parent_vhd_name])
@@ -84,22 +85,45 @@ module Kitchen
         run_ps mount_vm_iso
       end
 
+      def vhd_folder?
+        config[:parent_vhd_folder] && Dir.exist?(config[:parent_vhd_folder])
+      end
+
+      def vhd?
+        config[:parent_vhd_name] && File.exist?(parent_vhd_path)
+      end
+
       def validate_vm_settings
-        raise "Missing parent_vhd_folder" unless config[:parent_vhd_folder]
-        raise "Missing parent_vhd_name" unless config[:parent_vhd_name]
+        raise "Missing parent_vhd_folder" unless vhd_folder?
+        raise "Missing parent_vhd_name" unless vhd?
         if config[:dynamic_memory]
           startup_bytes = config[:memory_startup_bytes]
           min = config[:dynamic_memory_min_bytes]
           max = config[:dynamic_memory_max_bytes]
           memory_valid = startup_bytes.between?(min, max)
-          raise "memory_startup_bytes (#{startup_bytes}) must fall within dynamic memory range (#{min}-#{max})" unless memory_valid
+          warning = "memory_startup_bytes (#{startup_bytes}) must" /
+                    " fall within dynamic memory range (#{min}-#{max})"
+          raise warning  unless memory_valid
         end
-        return if config[:vm_switch]
-        config[:vm_switch] = (run_ps vm_default_switch_ps)['Name']
+        config[:vm_switch] = vm_switch
+      end
+
+      def vm_switch
+        default_switch_object = run_ps vm_default_switch_ps
+        if default_switch_object.nil? ||
+           !default_switch_object.key?('Name') ||
+           default_switch_object['Name'].empty?
+          raise "Failed to find a default VM Switch."
+        end
+        default_switch_object['Name']
       end
 
       def kitchen_vm_path
         @kitchen_vm_path ||= File.join(config[:kitchen_root], ".kitchen/#{instance.name}")
+      end
+
+      def boot_iso_path
+        @boot_iso_path ||= config[:boot_iso_path]
       end
 
       def differencing_disk_path
@@ -116,8 +140,7 @@ module Kitchen
         existing_vm = run_ps ensure_vm_running_ps
         return false if existing_vm.nil? || existing_vm['Id'].nil?
         info("Found an exising VM with an ID: #{existing_vm['Id']}")
-        return true
-        #fail('Failed to start existing VM.')
+        true
       end
 
       def remove_differencing_disk
@@ -146,9 +169,8 @@ module Kitchen
         @state[:id] = new_vm_object['Id']
         info("Created virtual machine for #{instance.name}.")
       end
-      
+
       def copy_vm_files
-        
         return if config[:copy_vm_files].nil?
         info("Copying files to virtual machine")
         config[:copy_vm_files].each do |file_info|
