@@ -17,7 +17,14 @@ $ProgressPreference = 'SilentlyContinue'
 function New-DifferencingDisk
 {
     [cmdletbinding()]
-    param ([string[]]$Path, [string]$ParentPath)
+    param (
+        [parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string[]]$Path,
+        [parameter(Mandatory)]        
+        [ValidateNotNullOrEmpty()] 
+        [string]$ParentPath
+    )
     if (-not (Test-Path $Path))
     {
         $null = new-vhd @psboundparameters -Differencing
@@ -192,9 +199,11 @@ function Get-VmDetail
 
 function Get-DefaultVMSwitch
 {
-    Get-VMSwitch |
-    Select-Object -First 1 |
-    Select-Object Name, Id
+    [CmdletBinding()]
+    param ($Name)
+    Get-VMSwitch @PSBoundParameters |
+        Select-Object -First 1 |
+        Select-Object Name, Id
 }
 
 function Mount-VMISO
