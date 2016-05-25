@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "finstyle"
   spec.add_development_dependency "rubocop"
   spec.add_development_dependency "yard"
+  spec.add_development_dependency "countloc"
 
   spec.add_dependency "test-kitchen", "~> 1.4"
 end

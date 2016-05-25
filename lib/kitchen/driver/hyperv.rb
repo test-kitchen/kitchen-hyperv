@@ -101,10 +101,21 @@ module Kitchen
           min = config[:dynamic_memory_min_bytes]
           max = config[:dynamic_memory_max_bytes]
           memory_valid = startup_bytes.between?(min, max)
-          raise "memory_startup_bytes (#{startup_bytes}) must fall within dynamic memory range (#{min}-#{max})" unless memory_valid
+          warning = "memory_startup_bytes (#{startup_bytes}) must" /
+                    " fall within dynamic memory range (#{min}-#{max})"
+          raise warning  unless memory_valid
         end
-        return if config[:vm_switch]
-        config[:vm_switch] = (run_ps vm_default_switch_ps)['Name']
+        config[:vm_switch] = vm_switch
+      end
+
+      def vm_switch
+        default_switch_object = run_ps vm_default_switch_ps
+        if default_switch_object.nil? ||
+           !default_switch_object.key?('Name') ||
+           default_switch_object['Name'].empty?
+          raise "Failed to find a default VM Switch."
+        end
+        default_switch_object['Name']
       end
 
       def kitchen_vm_path
