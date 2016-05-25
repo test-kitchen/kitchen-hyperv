@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 require "bundler/gem_tasks"
+require "kitchen/driver/hyperv_version"
 
 require "rake/testtask"
 Rake::TestTask.new(:unit) do |t|
@@ -56,7 +57,9 @@ begin
 
   GitHubChangelogGenerator::RakeTask.new :changelog do |config|
     #config.issues = false
-    config.future_release = Kitchen::Driver::HYPERV_VERSION
+    config.future_release = "v#{Kitchen::Driver::HYPERV_VERSION}"
+    config.since_tag = "v0.1.10"
+    config.token = ENV["GITHUB_TOKEN"]
     #config.enhancement_labels = "enhancement,Enhancement,New Feature,Feature".split(",")
     #config.bug_labels = "bug,Bug,Improvement,Upstream Bug".split(",")
     #config.exclude_labels = "duplicate,question,invalid,wontfix,no_changelog,Exclude From Changelog,Question,Discussion".split(",")
