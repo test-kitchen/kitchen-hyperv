@@ -29,11 +29,18 @@ module Kitchen
 
       def is_64bit?
         os_arch = ENV['PROCESSOR_ARCHITEW6432'] || ENV['PROCESSOR_ARCHITECTURE']
-        os_arch == 'AMD64'
+        ruby_arch = ['foo'].pack('p').size == 4 ? 32 : 64
+        os_arch == 'AMD64' && ruby_arch == 64
+      end
+
+      def is_32bit?
+        os_arch = ENV['PROCESSOR_ARCHITEW6432'] || ENV['PROCESSOR_ARCHITECTURE']
+        ruby_arch = ['foo'].pack('p').size == 4 ? 32 : 64
+        os_arch != 'AMD64' && ruby_arch == 32
       end
 
       def powershell_64_bit
-        if is_64bit?
+        if is_64bit? || is_32bit?
           'c:\windows\system32\windowspowershell\v1.0\powershell.exe'
         else
           'c:\windows\sysnative\windowspowershell\v1.0\powershell.exe'
@@ -43,7 +50,7 @@ module Kitchen
       def wrap_command(script)
         base_script_path = File.join(File.dirname(__FILE__), '/../../../support/hyperv.ps1')
         debug("Loading functions from #{base_script_path}")
-        new_script = ". #{base_script_path}; " << script
+        new_script = [ ". #{base_script_path}", "#{script}" ].join(";\n")
         debug("Wrapped script: #{new_script}")
         "#{powershell_64_bit} -noprofile -executionpolicy bypass" \
         " -encodedcommand #{encode_command new_script} -outputformat Text"
@@ -69,7 +76,11 @@ module Kitchen
         sh.run_command
         debug("Local Command END #{Util.duration(sh.execution_time)}")
         raise "Failed: #{sh.stderr}" if sh.error?
-        JSON.parse(sh.stdout) if sh.stdout.length > 2
+        JSON.parse(sanitize_stdout(sh.stdout)) if sh.stdout.length > 2
+      end
+
+      def sanitize_stdout(stdout)
+        stdout.split("\n").select { |s| !s.start_with?("PS") }.join("\n")
       end
 
       def new_differencing_disk_ps

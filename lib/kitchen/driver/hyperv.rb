@@ -79,20 +79,6 @@ module Kitchen
 
       private
 
-      def mount_virtual_machine_iso
-        return unless config[:iso_path]
-        info("Mounting #{config[:iso_path]}")
-        run_ps mount_vm_iso
-      end
-
-      def vhd_folder?
-        config[:parent_vhd_folder] && Dir.exist?(config[:parent_vhd_folder])
-      end
-
-      def vhd?
-        config[:parent_vhd_name] && File.exist?(parent_vhd_path)
-      end
-
       def validate_vm_settings
         raise "Missing parent_vhd_folder" unless vhd_folder?
         raise "Missing parent_vhd_name" unless vhd?
@@ -108,6 +94,13 @@ module Kitchen
         config[:vm_switch] = vm_switch
       end
 
+      def create_new_differencing_disk
+        return if File.exist? differencing_disk_path
+        info("Creating differencing disk for #{instance.name}.")
+        run_ps new_differencing_disk_ps
+        info("Created differencing disk for #{instance.name}.")
+      end
+
       def vm_switch
         default_switch_object = run_ps vm_default_switch_ps
         if default_switch_object.nil? ||
@@ -116,6 +109,62 @@ module Kitchen
           raise "Failed to find a default VM Switch."
         end
         default_switch_object['Name']
+      end
+
+      def create_virtual_machine
+        return if vm_exists
+        info("Creating virtual machine for #{instance.name}.")
+        new_vm_object = run_ps new_vm_ps
+        @state[:id] = new_vm_object['Id']
+        info("Created virtual machine for #{instance.name}.")
+      end
+
+      def update_state
+        vm_details
+        @state[:id] = @vm['Id']
+        @state[:hostname] = @vm['IpAddress']
+        @state[:vm_name] = @vm['Name']
+      end
+
+      def vm_details
+        run_ps set_vm_ipaddress_ps if config[:ip_address]
+        @vm = run_ps vm_details_ps
+      end
+
+      def mount_virtual_machine_iso
+        return unless config[:iso_path]
+        info("Mounting #{config[:iso_path]}")
+        run_ps mount_vm_iso
+      end
+
+      def copy_vm_files
+        return if config[:copy_vm_files].nil?
+        info("Copying files to virtual machine")
+        config[:copy_vm_files].each do |file_info|
+          run_ps copy_vm_file_ps(file_info[:source], file_info[:dest])
+        end
+        info("Copied files to virtual machine")
+      end
+
+      def vm_exists
+        info('Checking for existing virtual machine.')
+        return false unless @state.key?(:id) && !@state[:id].nil?
+        existing_vm = run_ps ensure_vm_running_ps
+        return false if existing_vm.nil? || existing_vm['Id'].nil?
+        info("Found an exising VM with an ID: #{existing_vm['Id']}")
+        true
+      end
+
+      def remove_virtual_machine
+        info("Deleting virtual machine for #{instance.name}")
+        run_ps delete_vm_ps
+        info("Deleted virtual machine for #{instance.name}")
+      end
+
+      def remove_differencing_disk
+        info("Removing the differencing disk for #{instance.name}.")
+        FileUtils.rm(differencing_disk_path)
+        info("Removed the differencing disk for #{instance.name}.")
       end
 
       def kitchen_vm_path
@@ -134,62 +183,27 @@ module Kitchen
         @parent_vhd_path ||= File.join(config[:parent_vhd_folder], config[:parent_vhd_name])
       end
 
-      def vm_exists
-        info('Checking for existing virtual machine.')
-        return false unless @state.key?(:id) && !@state[:id].nil?
-        existing_vm = run_ps ensure_vm_running_ps
-        return false if existing_vm.nil? || existing_vm['Id'].nil?
-        info("Found an exising VM with an ID: #{existing_vm['Id']}")
-        true
+      def vhd_folder?
+        config[:parent_vhd_folder] && Dir.exist?(config[:parent_vhd_folder])
       end
 
-      def remove_differencing_disk
-        info("Removing the differencing disk for #{instance.name}.")
-        FileUtils.rm(differencing_disk_path)
-        info("Removed the differencing disk for #{instance.name}.")
+      def vhd?
+        config[:parent_vhd_name] && File.exist?(parent_vhd_path)
       end
 
-      def create_new_differencing_disk
-        return if File.exist? differencing_disk_path
-        info("Creating differencing disk for #{instance.name}.")
-        run_ps new_differencing_disk_ps
-        info("Created differencing disk for #{instance.name}.")
-      end
 
-      def remove_virtual_machine
-        info("Deleting virtual machine for #{instance.name}")
-        run_ps delete_vm_ps
-        info("Deleted virtual machine for #{instance.name}")
-      end
 
-      def create_virtual_machine
-        return if vm_exists
-        info("Creating virtual machine for #{instance.name}.")
-        new_vm_object = run_ps new_vm_ps
-        @state[:id] = new_vm_object['Id']
-        info("Created virtual machine for #{instance.name}.")
-      end
 
-      def copy_vm_files
-        return if config[:copy_vm_files].nil?
-        info("Copying files to virtual machine")
-        config[:copy_vm_files].each do |file_info|
-          run_ps copy_vm_file_ps(file_info[:source], file_info[:dest])
-        end
-        info("Copied files to virtual machine")
-      end
 
-      def update_state
-        vm_details
-        @state[:id] = @vm['Id']
-        @state[:hostname] = @vm['IpAddress']
-        @state[:vm_name] = @vm['Name']
-      end
 
-      def vm_details
-        run_ps set_vm_ipaddress_ps if config[:ip_address]
-        @vm = run_ps vm_details_ps
-      end
+
+
+
+
+
+
+
+
     end
   end
 end
