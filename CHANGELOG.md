@@ -5,6 +5,7 @@
 
 **Merged pull requests:**
 
+- Support PowerShell v5.1 on the Insider Preview - updated [\#31](https://github.com/test-kitchen/kitchen-hyperv/pull/31) ([smurawski](https://github.com/smurawski))
 - Support PowerShell v5.1 on the Insider Preview [\#30](https://github.com/test-kitchen/kitchen-hyperv/pull/30) ([smurawski](https://github.com/smurawski))
 
 ## [v0.2.1](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.2.1) (2016-05-25)
