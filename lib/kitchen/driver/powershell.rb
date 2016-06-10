@@ -76,7 +76,8 @@ module Kitchen
         sh.run_command
         debug("Local Command END #{Util.duration(sh.execution_time)}")
         raise "Failed: #{sh.stderr}" if sh.error?
-        JSON.parse(sanitize_stdout(sh.stdout)) if sh.stdout.length > 2
+        stdout = sanitize_stdout(sh.stdout)
+        JSON.parse(stdout) if stdout.length > 2
       end
 
       def sanitize_stdout(stdout)
