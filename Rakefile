@@ -58,8 +58,10 @@ begin
   GitHubChangelogGenerator::RakeTask.new :changelog do |config|
     #config.issues = false
     config.future_release = "v#{Kitchen::Driver::HYPERV_VERSION}"
-    config.since_tag = "v0.1.10"
-    config.token = ENV["GITHUB_TOKEN"]
+    config.issues = false
+    config.pulls = true
+    config.user = 'test-kitchen'
+    config.project = 'kitchen-hyperv'
     #config.enhancement_labels = "enhancement,Enhancement,New Feature,Feature".split(",")
     #config.bug_labels = "bug,Bug,Improvement,Upstream Bug".split(",")
     #config.exclude_labels = "duplicate,question,invalid,wontfix,no_changelog,Exclude From Changelog,Question,Discussion".split(",")
