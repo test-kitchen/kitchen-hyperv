@@ -53,6 +53,8 @@ driver:
   * Path on the host to the ISO to mount before starting the VMs.
 * vm_generation
   * The generation for the hyper-v VM.  Defaults to 1.
+* enable_guest_services
+  * Enable the Hyper-V Integration Guest services for the VM before starting it. Hyper-V defauls is false (true|false)
 * disk_type
   * The type of virtual disk to create, .VHD or .VHDX.  Defaults to the file extension of the parent virtual hard drive.
 
