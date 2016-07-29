@@ -188,10 +188,6 @@ module Kitchen
         config[:parent_vhd_folder] && Dir.exist?(config[:parent_vhd_folder])
       end
 
-      def enable_guest_services
-        @enable_guest_services ||= config[:enable_guest_services]
-      end
-
       def vhd?
         config[:parent_vhd_name] && File.exist?(parent_vhd_path)
       end
