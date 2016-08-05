@@ -88,9 +88,9 @@ module Kitchen
           min = config[:dynamic_memory_min_bytes]
           max = config[:dynamic_memory_max_bytes]
           memory_valid = startup_bytes.between?(min, max)
-          warning = "memory_startup_bytes (#{startup_bytes}) must" /
+          warning = "memory_startup_bytes (#{startup_bytes}) must" \
                     " fall within dynamic memory range (#{min}-#{max})"
-          raise warning  unless memory_valid
+          raise warning unless memory_valid
         end
         config[:vm_switch] = vm_switch
       end
@@ -191,20 +191,6 @@ module Kitchen
       def vhd?
         config[:parent_vhd_name] && File.exist?(parent_vhd_path)
       end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     end
   end
 end
