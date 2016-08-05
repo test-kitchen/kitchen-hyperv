@@ -48,6 +48,7 @@ module Kitchen
       default_config :vm_switch
       default_config :iso_path
       default_config :boot_iso_path
+      default_config :enable_guest_services
       default_config :vm_generation, 1
       default_config :disk_type do |driver|
         File.extname(driver[:parent_vhd_name])
