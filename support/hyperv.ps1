@@ -217,6 +217,11 @@ function Mount-VMISO
     [cmdletbinding()]
     param($Id, $Path)
 
-    set-VMDvdDrive -VMName (Get-VM -Id $Id).Name -Path $Path
+    if ((Get-VM -Id $Id).Generation -eq 2)
+    {
+        Add-VMDvdDrive (Get-VM -Id $Id).Name | Set-VMDvdDrive -VMName (Get-VM -Id $Id).Name -Path $Path
+    }
+
+    Set-VMDvdDrive -VMName (Get-VM -Id $Id).Name -Path $Path
 }
 
