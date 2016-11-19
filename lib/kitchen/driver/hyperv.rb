@@ -136,6 +136,7 @@ module Kitchen
         return unless config[:iso_path]
         info("Mounting #{config[:iso_path]}")
         run_ps mount_vm_iso
+        info("Done mounting #{config[:iso_path]}")
       end
 
       def copy_vm_files
