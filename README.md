@@ -57,6 +57,8 @@ driver:
   * Enable the Hyper-V Integration Guest services for the VM before starting it. Hyper-V defauls is false (true|false)
 * disk_type
   * The type of virtual disk to create, .VHD or .VHDX.  Defaults to the file extension of the parent virtual hard drive.
+* Note
+  * A note to add to the VM's note field. Defaults to empty.
 
 ## Image Configuration
 
