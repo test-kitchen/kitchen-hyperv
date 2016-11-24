@@ -49,6 +49,7 @@ module Kitchen
       default_config :iso_path
       default_config :boot_iso_path
       default_config :enable_guest_services
+      default_config :vm_note
       default_config :vm_generation, 1
       default_config :disk_type do |driver|
         File.extname(driver[:parent_vhd_name])
@@ -65,6 +66,7 @@ module Kitchen
         mount_virtual_machine_iso
         instance.transport.connection(@state).wait_until_ready
         copy_vm_files
+        set_virtual_machine_note
         info("Hyper-V instance #{instance.to_str} created.")
       end
 
@@ -136,6 +138,11 @@ module Kitchen
         return unless config[:iso_path]
         info("Mounting #{config[:iso_path]}")
         run_ps mount_vm_iso
+      end
+      def set_virtual_machine_note
+        return unless config[:vm_note]
+        info("Adding note to VM: #{config[:vm_note]}")
+        run_ps set_vm_note
       end
 
       def copy_vm_files
