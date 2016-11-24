@@ -60,9 +60,9 @@ module Kitchen
       def create(state)
         @state = state
         validate_vm_settings
-        set_virtual_machine_note
         create_new_differencing_disk
         create_virtual_machine
+        set_virtual_machine_note
         update_state
         mount_virtual_machine_iso
         instance.transport.connection(@state).wait_until_ready
