@@ -160,9 +160,9 @@ module Kitchen
       end
 
       def set_vm_note
-        <<-MOUNTISO
+        <<-VMNOTE
           Set-VM -Name (Get-VM | Where-Object{ $_.ID -eq "#{@state[:id]}"}).Name -Note "#{config[:vm_note]}"
-        MOUNTISO
+        VMNOTE
       end
 
       def copy_vm_file_ps(source, dest)
