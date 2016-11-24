@@ -60,13 +60,13 @@ module Kitchen
       def create(state)
         @state = state
         validate_vm_settings
+        set_virtual_machine_note
         create_new_differencing_disk
         create_virtual_machine
         update_state
         mount_virtual_machine_iso
         instance.transport.connection(@state).wait_until_ready
         copy_vm_files
-        set_virtual_machine_note
         info("Hyper-V instance #{instance.to_str} created.")
       end
 
@@ -141,7 +141,7 @@ module Kitchen
       end
       def set_virtual_machine_note
         return unless config[:vm_note]
-        info("Adding note to VM: #{config[:vm_note]}")
+        info("Adding note to VM: '#{config[:vm_note]}'")
         run_ps set_vm_note
       end
 

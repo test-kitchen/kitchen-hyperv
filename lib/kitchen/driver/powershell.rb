@@ -161,7 +161,7 @@ module Kitchen
 
       def set_vm_note
         <<-MOUNTISO
-          Set-VM -Name "#{@state[:id]}" -Note #{config[:vm_note]}
+          Set-VM -Name (Get-VM | Where-Object{ $_.ID -eq "#{@state[:id]}"}).Name -Note "#{config[:vm_note]}"
         MOUNTISO
       end
 
