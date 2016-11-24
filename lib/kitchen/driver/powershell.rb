@@ -159,6 +159,12 @@ module Kitchen
         MOUNTISO
       end
 
+      def set_vm_note
+        <<-MOUNTISO
+          Set-VM -Name "#{@state[:id]}" -Note #{config[:vm_note]}
+        MOUNTISO
+      end
+
       def copy_vm_file_ps(source, dest)
         <<-FILECOPY
           Function CopyFile ($VM, [string]$SourcePath, [string]$DestPath) {
