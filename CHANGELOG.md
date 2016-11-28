@@ -1,11 +1,27 @@
 # Change Log
 
+## [v0.3.0](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.3.0) (2016-11-28)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.2.3...v0.3.0)
+
+**Merged pull requests:**
+
+- Support setting VM notes [\#39](https://github.com/test-kitchen/kitchen-hyperv/pull/39) ([watsonlu](https://github.com/watsonlu))
+- Fix mounting iso on Gen 2 VM [\#38](https://github.com/test-kitchen/kitchen-hyperv/pull/38) ([mahsoud](https://github.com/mahsoud))
+- Adding support for HyperV Guest Interface Services [\#34](https://github.com/test-kitchen/kitchen-hyperv/pull/34) ([gaelcolas](https://github.com/gaelcolas))
+- Fix line continuation syntax [\#32](https://github.com/test-kitchen/kitchen-hyperv/pull/32) ([brantb](https://github.com/brantb))
+
+## [v0.2.3](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.2.3) (2016-06-10)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.2.2...v0.2.3)
+
+**Merged pull requests:**
+
+- Support PowerShell v5.1 on the Insider Preview - updated [\#31](https://github.com/test-kitchen/kitchen-hyperv/pull/31) ([smurawski](https://github.com/smurawski))
+
 ## [v0.2.2](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.2.2) (2016-06-10)
 [Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.2.1...v0.2.2)
 
 **Merged pull requests:**
 
-- Support PowerShell v5.1 on the Insider Preview - updated [\#31](https://github.com/test-kitchen/kitchen-hyperv/pull/31) ([smurawski](https://github.com/smurawski))
 - Support PowerShell v5.1 on the Insider Preview [\#30](https://github.com/test-kitchen/kitchen-hyperv/pull/30) ([smurawski](https://github.com/smurawski))
 
 ## [v0.2.1](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.2.1) (2016-05-25)
