@@ -49,6 +49,7 @@ module Kitchen
       default_config :iso_path
       default_config :boot_iso_path
       default_config :enable_guest_services
+      default_config :vm_note
       default_config :vm_generation, 1
       default_config :disk_type do |driver|
         File.extname(driver[:parent_vhd_name])
@@ -61,6 +62,7 @@ module Kitchen
         validate_vm_settings
         create_new_differencing_disk
         create_virtual_machine
+        set_virtual_machine_note
         update_state
         mount_virtual_machine_iso
         instance.transport.connection(@state).wait_until_ready
@@ -137,6 +139,11 @@ module Kitchen
         info("Mounting #{config[:iso_path]}")
         run_ps mount_vm_iso
         info("Done mounting #{config[:iso_path]}")
+      end
+      def set_virtual_machine_note
+        return unless config[:vm_note]
+        info("Adding note to VM: '#{config[:vm_note]}'")
+        run_ps set_vm_note
       end
 
       def copy_vm_files
