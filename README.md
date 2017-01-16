@@ -58,7 +58,7 @@ driver:
 * disk_type
   * The type of virtual disk to create, .VHD or .VHDX.  Defaults to the file extension of the parent virtual hard drive.
 * resize_vhd
-  * Resize the disk to the specified size. Leave empty to keep the original size. Defaults to empty.
+  * Resize the disk to the specified size. Leave empty to keep the original size. Only works on newly created VM's. Defaults to empty.
 * vm_note
   * A note to add to the VM's note field. Defaults to empty.
 
