@@ -159,6 +159,12 @@ module Kitchen
         MOUNTISO
       end
 
+      def resize_vhd
+        <<-VMNOTE
+          Resize-VHD -Path "#{parent_vhd_path}" -SizeBytes "#{config[:resize_vhd]}"
+        VMNOTE
+      end
+
       def set_vm_note
         <<-VMNOTE
           Set-VM -Name (Get-VM | Where-Object{ $_.ID -eq "#{@state[:id]}"}).Name -Note "#{config[:vm_note]}"
