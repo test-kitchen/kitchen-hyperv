@@ -62,7 +62,6 @@ module Kitchen
         @state = state
         validate_vm_settings
         create_new_differencing_disk
-        set_new_vhd_size
         create_virtual_machine
         set_virtual_machine_note
         update_state
@@ -104,6 +103,7 @@ module Kitchen
         info("Creating differencing disk for #{instance.name}.")
         run_ps new_differencing_disk_ps
         info("Created differencing disk for #{instance.name}.")
+        set_new_vhd_size
       end
 
       def vm_switch
