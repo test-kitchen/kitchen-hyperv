@@ -147,6 +147,7 @@ module Kitchen
         return unless config[:resize_vhd]
         info("Resizing differencing disk for #{instance.name}.")
         run_ps resize_vhd
+        info("Resized differencing disk for #{instance.name}.")
       end
 
       def set_virtual_machine_note
