@@ -50,6 +50,7 @@ module Kitchen
       default_config :boot_iso_path
       default_config :enable_guest_services
       default_config :vm_note
+      default_config :resize_vhd
       default_config :vm_generation, 1
       default_config :disk_type do |driver|
         File.extname(driver[:parent_vhd_name])
@@ -102,6 +103,7 @@ module Kitchen
         info("Creating differencing disk for #{instance.name}.")
         run_ps new_differencing_disk_ps
         info("Created differencing disk for #{instance.name}.")
+        set_new_vhd_size
       end
 
       def vm_switch
@@ -140,6 +142,14 @@ module Kitchen
         run_ps mount_vm_iso
         info("Done mounting #{config[:iso_path]}")
       end
+
+      def set_new_vhd_size
+        return unless config[:resize_vhd]
+        info("Resizing differencing disk for #{instance.name}.")
+        run_ps resize_vhd
+        info("Resized differencing disk for #{instance.name}.")
+      end
+
       def set_virtual_machine_note
         return unless config[:vm_note]
         info("Adding note to VM: '#{config[:vm_note]}'")
