@@ -47,6 +47,8 @@ driver:
   * A list of DNS Servers that can be reached on the virtual network.
 * vm_switch
   * The virtual switch to attach the guest VMs.  Defaults to the first switch returned from Get-VMSwitch.
+* vm_vlan_id
+  * The VLAN ID to assign the virtual network adapter on the VM (Valid values: 1-4094).  Defaults to untagged.
 * iso_path
   * Path on the host to the ISO to mount on the VMs.
 * boot_iso_path
