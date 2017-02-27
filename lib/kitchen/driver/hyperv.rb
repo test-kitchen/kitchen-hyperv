@@ -46,6 +46,7 @@ module Kitchen
       default_config :dns_servers
       default_config :subnet, '255.255.255.0'
       default_config :vm_switch
+      default_config :vm_vlan_id
       default_config :iso_path
       default_config :boot_iso_path
       default_config :enable_guest_services
@@ -96,6 +97,15 @@ module Kitchen
           raise warning unless memory_valid
         end
         config[:vm_switch] = vm_switch
+        if config[:vm_vlan_id]
+          vm_vlan_id = config[:vm_vlan_id]
+          vm_vlan_id_min = 1
+          vm_vlan_id_max = 4094
+          vm_vlan_id_valid = vm_vlan_id.between?(vm_vlan_id_min, vm_vlan_id_max)
+          vm_vlan_id_warning = "vm_vlan_id (#{vm_vlan_id}) must be a valid 802.1Q" \
+                               " VLAN ID between (#{vm_vlan_id_min}-#{vm_vlan_id_max})"
+          raise vm_vlan_id_warning unless vm_vlan_id_valid
+        end
       end
 
       def create_new_differencing_disk
