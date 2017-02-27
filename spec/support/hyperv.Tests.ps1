@@ -41,3 +41,37 @@ describe 'New-DifferencingDisk' {
   }
 }
 
+Describe "New-KitchenVM with VlanId" {
+  function New-VM {}
+  function Set-VM {}
+  function Set-VMMemory {}
+  function Set-VMNetworkAdapterVlan {param ($VM, [Switch]$Access, $VlanId)}
+  function Start-VM {}
+  
+  Mock New-VM
+  Mock Set-VM
+  Mock Set-VMMemory
+  Mock Set-VMNetworkAdapterVlan
+  Mock Start-VM
+
+  Context "When VlanId is not specified" {
+    New-KitchenVM
+
+    It "Should not set the VlanId for the VM" {
+      Assert-MockCalled Set-VMNetworkAdapterVlan -Times 0
+    }
+  }
+
+  Context "When VlanId is specified" {
+    $testVlanId = 1
+    New-KitchenVM -VlanId $testVlanId
+
+    It "Should set the VlanId for the VM" {
+      Assert-MockCalled Set-VMNetworkAdapterVlan -Times 1 -ParameterFilter {
+        $VM -eq $null -and 
+        $Access -eq $true -and 
+        $VlanId -eq $testVlanId
+      }
+    }
+  }
+}
