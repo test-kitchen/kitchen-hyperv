@@ -72,6 +72,7 @@ function New-KitchenVM
 	    $Path,
 	    $VHDPath,
 	    $SwitchName,
+        $VlanId,
 	    $ProcessorCount,
       $UseDynamicMemory,
       $DynamicMemoryMinBytes,
@@ -85,6 +86,7 @@ function New-KitchenVM
 	  $null = $psboundparameters.remove('DynamicMemoryMaxBytes')
 	  $null = $psboundparameters.remove('boot_iso_path')
       $null = $psboundparameters.remove('EnableGuestServices')
+      $null = $psboundparameters.remove('VlanId')
 	  $UseDynamicMemory = [Convert]::ToBoolean($UseDynamicMemory)
 	  $null = [bool]::TryParse($EnableGuestServices,[ref]$EnableGuestServices)
 
@@ -101,6 +103,9 @@ function New-KitchenVM
       }
       if ($EnableGuestServices -and (Get-command Enable-VMIntegrationService -ErrorAction SilentlyContinue)) {
         Enable-VMIntegrationService -VM $vm -Name 'Guest Service Interface'
+      }
+      if (($VlanId -ne $null) -and (Get-command Set-VMNetworkAdapterVlan -ErrorAction SilentlyContinue)) {
+        Set-VMNetworkAdapterVlan -VM $vm -Access -VlanId $VlanId
       }
 	  $vm | Start-Vm -passthru |
 	    foreach {
