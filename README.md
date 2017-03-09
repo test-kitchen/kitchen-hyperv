@@ -20,6 +20,8 @@ driver:
   name: 'hyperv'
 ```
 
+Guest VMs should have the latest Integration Components installed.  See https://support.microsoft.com/en-us/help/3063109/hyper-v-integration-components-update-for-windows-virtual-machines-that-are-running-on-a-windows-10-based-host
+
 ### Required parameters:
 
 * parent_vhd_folder
