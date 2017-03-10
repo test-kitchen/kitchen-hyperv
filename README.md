@@ -20,8 +20,6 @@ driver:
   name: 'hyperv'
 ```
 
-Guest VMs should have the latest Integration Components installed.  See https://support.microsoft.com/en-us/help/3063109/hyper-v-integration-components-update-for-windows-virtual-machines-that-are-running-on-a-windows-10-based-host
-
 ### Required parameters:
 
 * parent_vhd_folder
@@ -63,18 +61,25 @@ Guest VMs should have the latest Integration Components installed.  See https://
   * Resize the disk to the specified size. Leave empty to keep the original size. Only works on newly created VM's. Defaults to empty.
 * vm_note
   * A note to add to the VM's note field. Defaults to empty.
+* copy_vm_files
+  * An array of hashes (`source` and `dest`) of files or directories to copy over to the sytem under test.
+  * example: 
+  
+```
+driver:
+  name: hyperv
+  copy_vm_files:
+    - source: c:/users/steven/downloads/chef-client-12.19.36-1-x64.msi
+      dest: c:/users/administrator/appdata/local/temp/chef-client-12.19.36-1-x64.msi
+```
+
 
 ## Image Configuration
 
  The following changes need to be made to a Windows image that is going to be used for testing.  This is not an exhaustive list and, your milage may vary.
+ 
+* Guest VMs should have the latest Integration Components installed.  See https://support.microsoft.com/en-us/help/3063109/hyper-v-integration-components-update-for-windows-virtual-machines-that-are-running-on-a-windows-10-based-host
 
-#### WinRM
-
-```powershell
-winrm set winrm/config/client/auth @{Basic="true"}
-winrm set winrm/config/service/auth @{Basic="true"}
-winrm set winrm/config/service @{AllowUnencrypted="true"}
- ```
 ## Contributing
 
 1. Fork it ( https://github.com/[my-github-username]/kitchen-hyperv/fork )
