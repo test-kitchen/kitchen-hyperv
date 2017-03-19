@@ -41,3 +41,51 @@ describe 'New-DifferencingDisk' {
   }
 }
 
+Describe "New-KitchenVM with DisableSecureBoot" {
+  function New-VM {}
+  function Set-VM {}
+  function Set-VMMemory {}
+  function Set-VMFirmware {param ($EnableSecureBoot)}
+  function Start-VM {}
+  
+  Mock New-VM
+  Mock Set-VM
+  Mock Set-VMMemory
+  Mock Set-VMFirmware
+  Mock Start-VM
+
+  Context "When DisableSecureBoot is not specified" {
+    New-KitchenVM
+
+    It "Should not set firmware settings on the VM" {
+      Assert-MockCalled Set-VMFirmware -Times 0
+    }
+  }
+
+  Context "When DisableSecureBoot is False" {
+    New-KitchenVM -DisableSecureBoot $false
+
+    It "Should not set firmware settings on the VM" {
+      Assert-MockCalled Set-VMFirmware -Times 0
+    }
+  }
+
+  Context "When DisableSecureBoot is True and Generation is 1" {
+    New-KitchenVM -Generation 1 -DisableSecureBoot $true
+
+    It "Should not set firmware settings on the VM" {
+      Assert-MockCalled Set-VMFirmware -Times 0
+    }
+  }
+
+  Context "When DisableSecureBoot is True and Generation is 2" {
+    New-KitchenVM -Generation 2 -DisableSecureBoot $true
+
+    It "Should disable secure boot on the VM" {
+      Assert-MockCalled Set-VMFirmware -Times 1 -ParameterFilter {
+        $VM -eq $null -and 
+        $EnableSecureBoot -eq "Off"
+      }
+    }
+  }
+}
