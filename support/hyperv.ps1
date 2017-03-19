@@ -67,6 +67,7 @@ function New-KitchenVM
     [cmdletbinding()]
     param (
       $Generation = 1,
+      $DisableSecureBoot,
 	    $MemoryStartupBytes,
 	    $Name,
 	    $Path,
@@ -79,12 +80,14 @@ function New-KitchenVM
       $boot_iso_path,
       $EnableGuestServices
 	  )
+      $null = $psboundparameters.remove('DisableSecureBoot')
 	  $null = $psboundparameters.remove('ProcessorCount')
 	  $null = $psboundparameters.remove('UseDynamicMemory')
 	  $null = $psboundparameters.remove('DynamicMemoryMinBytes')
 	  $null = $psboundparameters.remove('DynamicMemoryMaxBytes')
 	  $null = $psboundparameters.remove('boot_iso_path')
       $null = $psboundparameters.remove('EnableGuestServices')
+      $DisableSecureBoot = [Convert]::ToBoolean($DisableSecureBoot)
 	  $UseDynamicMemory = [Convert]::ToBoolean($UseDynamicMemory)
 	  $null = [bool]::TryParse($EnableGuestServices,[ref]$EnableGuestServices)
 
@@ -101,6 +104,9 @@ function New-KitchenVM
       }
       if ($EnableGuestServices -and (Get-command Enable-VMIntegrationService -ErrorAction SilentlyContinue)) {
         Enable-VMIntegrationService -VM $vm -Name 'Guest Service Interface'
+      }
+      if ($DisableSecureBoot -and ($Generation -eq 2) -and (Get-command Set-VMFirmware -ErrorAction SilentlyContinue)) {
+        Set-VMFirmware -VM $vm -EnableSecureBoot Off
       }
 	  $vm | Start-Vm -passthru |
 	    foreach {
