@@ -71,7 +71,7 @@ driver:
       * The type of virtual disk to create, .VHD or .VHDX.  Defaults to the file extension of the parent virtual hard drive.
   * example: 
   
-```
+```yaml
 driver:
   name: hyperv
   parent_vhd_folder: 'D:\Hyper-V\Virtual Hard Disks'
