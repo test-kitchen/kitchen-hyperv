@@ -77,7 +77,8 @@ function New-KitchenVM
       $DynamicMemoryMinBytes,
       $DynamicMemoryMaxBytes,
       $boot_iso_path,
-      $EnableGuestServices
+      $EnableGuestServices,
+      $AdditionalDisks
 	  )
 	  $null = $psboundparameters.remove('ProcessorCount')
 	  $null = $psboundparameters.remove('UseDynamicMemory')
@@ -85,6 +86,7 @@ function New-KitchenVM
 	  $null = $psboundparameters.remove('DynamicMemoryMaxBytes')
 	  $null = $psboundparameters.remove('boot_iso_path')
       $null = $psboundparameters.remove('EnableGuestServices')
+      $null = $psboundparameters.remove('AdditionalDisks')
 	  $UseDynamicMemory = [Convert]::ToBoolean($UseDynamicMemory)
 	  $null = [bool]::TryParse($EnableGuestServices,[ref]$EnableGuestServices)
 
@@ -101,6 +103,11 @@ function New-KitchenVM
       }
       if ($EnableGuestServices -and (Get-command Enable-VMIntegrationService -ErrorAction SilentlyContinue)) {
         Enable-VMIntegrationService -VM $vm -Name 'Guest Service Interface'
+      }
+      if ($AdditionalDisks -and (Get-command Add-VMHardDiskDrive -ErrorAction SilentlyContinue)) {
+          foreach ($AdditionalDisk in $AdditionalDisks) {
+              $vm | Add-VMHardDiskDrive -Path $AdditionalDisk
+          }
       }
 	  $vm | Start-Vm -passthru |
 	    foreach {

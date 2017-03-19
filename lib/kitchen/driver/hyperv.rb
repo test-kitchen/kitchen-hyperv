@@ -62,6 +62,7 @@ module Kitchen
         @state = state
         validate_vm_settings
         create_new_differencing_disk
+        create_additional_disks
         create_virtual_machine
         set_virtual_machine_note
         update_state
@@ -77,6 +78,7 @@ module Kitchen
         instance.transport.connection(state).close
         remove_virtual_machine
         remove_differencing_disk
+        remove_additional_disks
         info("The Hyper-V instance #{instance.to_str} has been removed.")
         state.delete(:id)
       end
@@ -104,6 +106,22 @@ module Kitchen
         run_ps new_differencing_disk_ps
         info("Created differencing disk for #{instance.name}.")
         set_new_vhd_size
+      end
+
+      def create_additional_disks
+        return if config[:additional_disks].nil?
+        @additional_disk_objects = []
+        config[:additional_disks].each do |additional_disk|
+          raise "Missing name for additional disk" unless additional_disk[:name]
+          disk_type = additional_disk[:type] || config[:disk_type]
+          disk_path = additional_disk_path(additional_disk[:name], disk_type)
+          raise "Additional disk file already exists: #{disk_path}" unless !File.exist?(disk_path)
+          disk_size = additional_disk[:size_gb] || 5
+          info("Creating additional disk #{additional_disk[:name]} for #{instance.name}.")
+          run_ps new_additional_disk_ps(disk_path, disk_size)
+          info("Created additional disk #{additional_disk[:name]} for #{instance.name}.")
+          @additional_disk_objects.push(disk_path)
+        end
       end
 
       def vm_switch
@@ -186,6 +204,20 @@ module Kitchen
         info("Removed the differencing disk for #{instance.name}.")
       end
 
+      def remove_additional_disks
+        return if config[:additional_disks].nil?
+        config[:additional_disks].each do |additional_disk|
+          raise "Missing name for additional disk" unless additional_disk[:name]
+          disk_type = additional_disk[:type] || config[:disk_type]
+          disk_path = additional_disk_path(additional_disk[:name], disk_type)
+          if File.exist?(disk_path)
+            info("Removing additional disk #{additional_disk[:name]} for #{instance.name}.")
+            FileUtils.rm(disk_path)
+            info("Removed additional disk #{additional_disk[:name]} for #{instance.name}.")
+          end
+        end
+      end
+
       def kitchen_vm_path
         @kitchen_vm_path ||= File.join(config[:kitchen_root], ".kitchen/#{instance.name}")
       end
@@ -196,6 +228,10 @@ module Kitchen
 
       def differencing_disk_path
         @differencing_disk_path ||= File.join(kitchen_vm_path, "diff" + "#{config[:disk_type]}")
+      end
+
+      def additional_disk_path(disk_name, disk_type)
+        File.join(kitchen_vm_path, disk_name + disk_type)
       end
 
       def parent_vhd_path
