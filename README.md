@@ -61,15 +61,15 @@ driver:
   * Resize the disk to the specified size. Leave empty to keep the original size. Only works on newly created VM's. Defaults to empty.
 * additional_disks
   * An array of hashes (`name`,`size_gb`, and `type`) of additional disks to attach to the VM.
-  * #### Required parameters:
+  * **Required parameters:**
     * name
       * Unique name for the virtual disk.
-  * #### Optional parameters:
+  * **Optional parameters:**
     * size_gb
       * Integer. If not provided, will default to 5.
     * type
       * The type of virtual disk to create, .VHD or .VHDX.  Defaults to the file extension of the parent virtual hard drive.
-  * example: 
+  * Example: 
   
 ```yaml
 driver:
