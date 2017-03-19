@@ -106,7 +106,7 @@ function New-KitchenVM
       }
       if ($AdditionalDisks -and (Get-command Add-VMHardDiskDrive -ErrorAction SilentlyContinue)) {
           foreach ($AdditionalDisk in $AdditionalDisks) {
-              $vm | Add-VMHardDiskDrive -Path $AdditionalDisk
+              Add-VMHardDiskDrive -VM $vm -Path $AdditionalDisk
           }
       }
 	  $vm | Start-Vm -passthru |
