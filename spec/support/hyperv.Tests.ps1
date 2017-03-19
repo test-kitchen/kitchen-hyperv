@@ -41,3 +41,37 @@ describe 'New-DifferencingDisk' {
   }
 }
 
+Describe "New-KitchenVM with AdditionalDisks" {
+  function New-VM {}
+  function Set-VM {}
+  function Set-VMMemory {}
+  function Add-VMHardDiskDrive {param ($Path)}
+  function Start-VM {}
+  
+  Mock New-VM
+  Mock Set-VM
+  Mock Set-VMMemory
+  Mock Add-VMHardDiskDrive
+  Mock Start-VM
+
+  Context "When AdditionalDisks is not specified" {
+    New-KitchenVM
+
+    It "Should not add additional disks to the VM" {
+      Assert-MockCalled Add-VMHardDiskDrive -Times 0
+    }
+  }
+
+  Context "When AdditionalDisks is specified" {
+    $AdditionalDisks = @(".\test1.vhd", ".\test2.vhdx")
+    New-KitchenVM -AdditionalDisks $AdditionalDisks
+
+    It "Should add additinoal disks to the VM" {
+      Assert-MockCalled Add-VMHardDiskDrive -Times $AdditionalDisks.Count -ParameterFilter {
+        $VM -eq $null -and 
+        $Path -in $AdditionalDisks
+      }
+    }
+  }
+}
+
