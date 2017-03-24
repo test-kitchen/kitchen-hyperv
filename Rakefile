@@ -21,36 +21,7 @@ task :stats do
   sh "countloc -r spec"
 end
 
-require "finstyle"
-require "rubocop/rake_task"
-RuboCop::RakeTask.new(:style) do |task|
-  task.options << "--display-cop-names"
-  task.options << "--lint"
-  task.options << '--config' << '.rubocop.yml'
-  task.patterns = ['lib/**/*.rb']
-end
-
-require "cane/rake_task"
-desc "Run cane to check quality metrics"
-Cane::RakeTask.new do |cane|
-  cane.canefile = "./.cane"
-end
-
-desc "Run all quality tasks"
-task :quality => [:cane, :style, :stats]
-
-require "yard"
-YARD::Rake::YardocTask.new
-
-desc "Generate gem dependency graph"
-task :viz do
-  Bundler.with_clean_env do
-    sh "bundle viz --without test development guard " \
-      "--requirements --version"
-  end
-end
-
-task :default => [:test, :quality]
+task :default => [:test]
 
 begin
   require "github_changelog_generator/task"
