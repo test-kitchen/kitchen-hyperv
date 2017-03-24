@@ -108,6 +108,7 @@ module Kitchen
             Path = "#{kitchen_vm_path}"
             VHDPath = "#{differencing_disk_path}"
             SwitchName = "#{config[:vm_switch]}"
+            VlanId = #{config[:vm_vlan_id] || '$null'}
             ProcessorCount = #{config[:processor_count]}
             UseDynamicMemory = "#{config[:dynamic_memory]}"
             DynamicMemoryMinBytes = #{config[:dynamic_memory_min_bytes]}
