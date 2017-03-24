@@ -1,21 +1,18 @@
 #requires -Version 2 -Modules Hyper-V
 
 #implicitly import hyperv module to avoid powercli cmdlets
-if((Get-Module -Name 'hyper-v') -ne $null)
-{
+if ((Get-Module -Name 'hyper-v') -ne $null) {
     Remove-Module -Name hyper-v
     Import-Module -Name hyper-v
 }
-else
-{
+else {
     Import-Module -Name hyper-v
 }
 
 $ProgressPreference = 'SilentlyContinue'
 
 
-function New-DifferencingDisk
-{
+function New-DifferencingDisk {
     [cmdletbinding()]
     param (
         [parameter(Mandatory)]
@@ -25,111 +22,110 @@ function New-DifferencingDisk
         [ValidateNotNullOrEmpty()] 
         [string]$ParentPath
     )
-    if (-not (Test-Path $Path))
-    {
+    if (-not (Test-Path $Path)) {
         $null = new-vhd @psboundparameters -Differencing
     }
 }
 
-function Assert-VmRunning
-{
+function Assert-VmRunning {
     [cmdletbinding()]
     param([string]$Id)
 
-    if ([string]::IsNullOrEmpty($Id))
-    {
+    if ([string]::IsNullOrEmpty($Id)) {
         $Output = [pscustomobject]@{
-            Name  = ''
+            Name = ''
             State = ''
         }
     }
-    else
-    {
+    else {
         $Output = Get-VM -Id $Id |
-        ForEach-Object -Process {
-            if ($_.State -notlike 'Running')
-            {
+            ForEach-Object -Process {
+            if ($_.State -notlike 'Running') {
                 $_ |
-                Start-VM -passthru
+                    Start-VM -passthru
             }
-            else
-            {
+            else {
                 $_
             }
         } |
-        Select-Object -Property Name, Id, State
+            Select-Object -Property Name, Id, State
     }
     $Output
 }
 
-function New-KitchenVM
-{
+function New-KitchenVM {
     [cmdletbinding()]
     param (
-      $Generation = 1,
-	    $MemoryStartupBytes,
-	    $Name,
-	    $Path,
-	    $VHDPath,
-	    $SwitchName,
+        $Generation = 1,
+        $MemoryStartupBytes,
+        $Name,
+        $Path,
+        $VHDPath,
+        $SwitchName,
         $VlanId,
-	    $ProcessorCount,
-      $UseDynamicMemory,
-      $DynamicMemoryMinBytes,
-      $DynamicMemoryMaxBytes,
-      $boot_iso_path,
-      $EnableGuestServices
-	  )
-	  $null = $psboundparameters.remove('ProcessorCount')
-	  $null = $psboundparameters.remove('UseDynamicMemory')
-	  $null = $psboundparameters.remove('DynamicMemoryMinBytes')
-	  $null = $psboundparameters.remove('DynamicMemoryMaxBytes')
-	  $null = $psboundparameters.remove('boot_iso_path')
-      $null = $psboundparameters.remove('EnableGuestServices')
-      $null = $psboundparameters.remove('VlanId')
-	  $UseDynamicMemory = [Convert]::ToBoolean($UseDynamicMemory)
-	  $null = [bool]::TryParse($EnableGuestServices,[ref]$EnableGuestServices)
+        $ProcessorCount,
+        $UseDynamicMemory,
+        $DynamicMemoryMinBytes,
+        $DynamicMemoryMaxBytes,
+        $boot_iso_path,
+        $EnableGuestServices,
+        $AdditionalDisks
+    )
+    $null = $psboundparameters.remove('ProcessorCount')
+    $null = $psboundparameters.remove('UseDynamicMemory')
+    $null = $psboundparameters.remove('DynamicMemoryMinBytes')
+    $null = $psboundparameters.remove('DynamicMemoryMaxBytes')
+    $null = $psboundparameters.remove('boot_iso_path')
+    $null = $psboundparameters.remove('EnableGuestServices')
+    $null = $psboundparameters.remove('VlanId')
+    $null = $psboundparameters.remove('AdditionalDisks')
+    $UseDynamicMemory = [Convert]::ToBoolean($UseDynamicMemory)
+    $null = [bool]::TryParse($EnableGuestServices, [ref]$EnableGuestServices)
 
-	  $vm = new-vm @psboundparameters |
-	    Set-Vm -ProcessorCount $ProcessorCount -passthru
+    $vm = new-vm @psboundparameters |
+        Set-Vm -ProcessorCount $ProcessorCount -passthru
     if ($UseDynamicMemory) {
-      $vm | Set-VMMemory -DynamicMemoryEnabled $true -MinimumBytes $DynamicMemoryMinBytes -MaximumBytes $DynamicMemoryMaxBytes
+        $vm | Set-VMMemory -DynamicMemoryEnabled $true -MinimumBytes $DynamicMemoryMinBytes -MaximumBytes $DynamicMemoryMaxBytes
     }
     else {
-      $vm | Set-VMMemory -DynamicMemoryEnabled $false
+        $vm | Set-VMMemory -DynamicMemoryEnabled $false
     }
-      if (-not [string]::IsNullOrEmpty($boot_iso_path)) {
+    if (-not [string]::IsNullOrEmpty($boot_iso_path)) {
         Mount-VMISO -Id $vm.Id -Path $boot_iso_path
-      }
-      if ($EnableGuestServices -and (Get-command Enable-VMIntegrationService -ErrorAction SilentlyContinue)) {
+    }
+    if ($EnableGuestServices -and (Get-command Enable-VMIntegrationService -ErrorAction SilentlyContinue)) {
         Enable-VMIntegrationService -VM $vm -Name 'Guest Service Interface'
-      }
-      if (($VlanId -ne $null) -and (Get-command Set-VMNetworkAdapterVlan -ErrorAction SilentlyContinue)) {
+    }
+    if (($VlanId -ne $null) -and (Get-command Set-VMNetworkAdapterVlan -ErrorAction SilentlyContinue)) {
         Set-VMNetworkAdapterVlan -VM $vm -Access -VlanId $VlanId
-      }
-	  $vm | Start-Vm -passthru |
-	    foreach {
-	      $vm = $_
-	      do {
-	        start-sleep -seconds 2
-	      } while ($vm.state -notlike 'Running')
-	      $vm
-	    } |
-	    select Name, Id, State
+    }
+    if ($AdditionalDisks -and (Get-command Add-VMHardDiskDrive -ErrorAction SilentlyContinue)) {
+        foreach ($AdditionalDisk in $AdditionalDisks) {
+            Add-VMHardDiskDrive -VM $vm -Path $AdditionalDisk
+        }
+    }
+    $vm | Start-Vm -passthru |
+        foreach {
+        $vm = $_
+        do {
+            start-sleep -seconds 2
+        }
+        while ($vm.state -notlike 'Running')
+        $vm
+    } |
+        select Name, Id, State
 }
 
-function Get-VmIP($vm)
-{
+function Get-VmIP($vm) {
     start-sleep -seconds 10
     $vm.networkadapters.ipaddresses |
-    Where-Object {
+        Where-Object {
         $_ -match '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
     } |
-    Select-Object -First 1
+        Select-Object -First 1
 }
 
-Function Set-VMNetworkConfiguration
-{
+Function Set-VMNetworkConfiguration {
     [CmdletBinding()]
     Param (
         [parameter(valuefrompipeline)]
@@ -149,10 +145,8 @@ Function Set-VMNetworkConfiguration
     $VMNetAdapters = $VMSettings.GetRelated('Msvm_SyntheticEthernetPortSettingData')
 
     $NetworkSettings = @()
-    foreach ($NetAdapter in $VMNetAdapters)
-    {
-        if ($NetAdapter.Address -eq $NetworkAdapter.MacAddress)
-        {
+    foreach ($NetAdapter in $VMNetAdapters) {
+        if ($NetAdapter.Address -eq $NetworkAdapter.MacAddress) {
             $NetworkSettings = $NetworkSettings + $NetAdapter.GetRelated('Msvm_GuestNetworkAdapterConfiguration')
         }
     }
@@ -168,48 +162,42 @@ Function Set-VMNetworkConfiguration
     $Service = Get-WmiObject -Class 'Msvm_VirtualSystemManagementService' -Namespace 'root\virtualization\v2'
     $setIP = $Service.SetGuestNetworkAdapterConfiguration($vm, $NetworkSettings[0].GetText(1))
 
-    if ($setIP.ReturnValue -eq 4096)
-    {
+    if ($setIP.ReturnValue -eq 4096) {
         $job = [WMI]$setIP.job
 
-        while ($job.JobState -eq 3 -or $job.JobState -eq 4)
-        {
+        while ($job.JobState -eq 3 -or $job.JobState -eq 4) {
             Start-Sleep 1
             $job = [WMI]$setIP.job
         }
 
-        if ($job.JobState -ne 7)
-        {
+        if ($job.JobState -ne 7) {
             $job.GetError()
         }
     }
     (Get-VM -Id $NetworkAdapter.VmId).NetworkAdapter | Select-Object Name, IpAddress
 }
 
-function Get-VmDetail
-{
+function Get-VmDetail {
     [cmdletbinding()]
     param($Id)
 
     Get-VM -Id $Id |
-    ForEach-Object {
+        ForEach-Object {
         $vm = $_
-        do
-        {
+        do {
             Start-Sleep -Seconds 1
         }
         while (-not (Get-VmIP $vm))
 
         [pscustomobject]@{
-            Name      = $vm.name
-            Id        = $vm.ID
+            Name = $vm.name
+            Id = $vm.ID
             IpAddress = (Get-VmIP $vm)
         }
     }
 }
 
-function Get-DefaultVMSwitch
-{
+function Get-DefaultVMSwitch {
     [CmdletBinding()]
     param ($Name)
     Get-VMSwitch @PSBoundParameters |
@@ -217,13 +205,11 @@ function Get-DefaultVMSwitch
         Select-Object Name, Id
 }
 
-function Mount-VMISO
-{
+function Mount-VMISO {
     [cmdletbinding()]
     param($Id, $Path)
 
-    if ((Get-VM -Id $Id).Generation -eq 2)
-    {
+    if ((Get-VM -Id $Id).Generation -eq 2) {
         Add-VMDvdDrive (Get-VM -Id $Id).Name | Set-VMDvdDrive -VMName (Get-VM -Id $Id).Name -Path $Path
     }
 

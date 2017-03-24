@@ -91,6 +91,13 @@ module Kitchen
         DIFF
       end
 
+      def new_additional_disk_ps(disk_path, disk_size)
+        <<-ADDDISK
+
+          New-VHD -Path "#{disk_path}" -SizeBytes #{disk_size}GB | Out-Null
+        ADDDISK
+      end
+
       def ensure_vm_running_ps
         <<-RUNNING
 
@@ -115,6 +122,7 @@ module Kitchen
             DynamicMemoryMaxBytes = #{config[:dynamic_memory_max_bytes]}
             boot_iso_path = "#{boot_iso_path}"
             EnableGuestServices = "#{config[:enable_guest_services]}"
+            AdditionalDisks = @("#{@additional_disk_objects.join('","') || ''}")
           }
           New-KitchenVM @NewVMParams | ConvertTo-Json
         NEWVM

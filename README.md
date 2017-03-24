@@ -61,6 +61,30 @@ driver:
   * The type of virtual disk to create, .VHD or .VHDX.  Defaults to the file extension of the parent virtual hard drive.
 * resize_vhd
   * Resize the disk to the specified size. Leave empty to keep the original size. Only works on newly created VM's. Defaults to empty.
+* additional_disks
+  * An array of hashes (`name`,`size_gb`, and `type`) of additional disks to attach to the VM.
+  * **Required parameters:**
+    * name
+      * Unique name for the virtual disk.
+  * **Optional parameters:**
+    * size_gb
+      * Integer. If not provided, will default to 5.
+    * type
+      * The type of virtual disk to create, .VHD or .VHDX.  Defaults to the file extension of the parent virtual hard drive.
+  * Example: 
+  
+```yaml
+driver:
+  name: hyperv
+  parent_vhd_folder: 'D:\Hyper-V\Virtual Hard Disks'
+  parent_vhd_name: tk_test.vhdx
+  additional_disks:
+    - name: disk1
+      size_gb: 10
+    - name: disk2
+      size_gb: 50
+      type: .VHD
+```
 * vm_note
   * A note to add to the VM's note field. Defaults to empty.
 * copy_vm_files
