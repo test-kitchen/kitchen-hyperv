@@ -53,6 +53,7 @@ module Kitchen
       default_config :vm_note
       default_config :resize_vhd
       default_config :vm_generation, 1
+      default_config :disable_secureboot, false
       default_config :disk_type do |driver|
         File.extname(driver[:parent_vhd_name])
       end

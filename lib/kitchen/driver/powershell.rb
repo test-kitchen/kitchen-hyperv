@@ -110,6 +110,7 @@ module Kitchen
 
           $NewVMParams = @{
             Generation = #{config[:vm_generation]}
+            DisableSecureBoot = "#{config[:disable_secureboot]}"
             MemoryStartupBytes = #{config[:memory_startup_bytes]}
             Name = "#{instance.name}"
             Path = "#{kitchen_vm_path}"

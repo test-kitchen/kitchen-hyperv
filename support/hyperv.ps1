@@ -57,6 +57,7 @@ function New-KitchenVM {
     [cmdletbinding()]
     param (
         $Generation = 1,
+        $DisableSecureBoot,
         $MemoryStartupBytes,
         $Name,
         $Path,
@@ -71,6 +72,7 @@ function New-KitchenVM {
         $EnableGuestServices,
         $AdditionalDisks
     )
+    $null = $psboundparameters.remove('DisableSecureBoot')    
     $null = $psboundparameters.remove('ProcessorCount')
     $null = $psboundparameters.remove('UseDynamicMemory')
     $null = $psboundparameters.remove('DynamicMemoryMinBytes')
@@ -79,11 +81,13 @@ function New-KitchenVM {
     $null = $psboundparameters.remove('EnableGuestServices')
     $null = $psboundparameters.remove('VlanId')
     $null = $psboundparameters.remove('AdditionalDisks')
+    $DisableSecureBoot = [Convert]::ToBoolean($DisableSecureBoot)
     $UseDynamicMemory = [Convert]::ToBoolean($UseDynamicMemory)
     $null = [bool]::TryParse($EnableGuestServices, [ref]$EnableGuestServices)
 
     $vm = new-vm @psboundparameters |
         Set-Vm -ProcessorCount $ProcessorCount -passthru
+
     if ($UseDynamicMemory) {
         $vm | Set-VMMemory -DynamicMemoryEnabled $true -MinimumBytes $DynamicMemoryMinBytes -MaximumBytes $DynamicMemoryMaxBytes
     }
@@ -103,6 +107,9 @@ function New-KitchenVM {
         foreach ($AdditionalDisk in $AdditionalDisks) {
             Add-VMHardDiskDrive -VM $vm -Path $AdditionalDisk
         }
+    }
+    if ($DisableSecureBoot -and ($Generation -eq 2) -and (Get-command Set-VMFirmware -ErrorAction SilentlyContinue)) {
+        Set-VMFirmware -VM $vm -EnableSecureBoot Off
     }
     $vm | Start-Vm -passthru |
         foreach {
