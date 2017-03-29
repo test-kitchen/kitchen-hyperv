@@ -123,10 +123,17 @@ module Kitchen
             DynamicMemoryMaxBytes = #{config[:dynamic_memory_max_bytes]}
             boot_iso_path = "#{boot_iso_path}"
             EnableGuestServices = "#{config[:enable_guest_services]}"
-            AdditionalDisks = @("#{@additional_disk_objects.join('","') || ''}")
+            #{additional_disks}
           }
           New-KitchenVM @NewVMParams | ConvertTo-Json
         NEWVM
+      end
+
+      def additional_disks
+        return if config[:additional_disks].nil?
+        <<-EOH
+        AdditionalDisks = @("#{@additional_disk_objects.join('","')}")
+        EOH
       end
 
       def vm_details_ps
