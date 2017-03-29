@@ -49,6 +49,7 @@ module Kitchen
       default_config :vm_vlan_id
       default_config :iso_path
       default_config :boot_iso_path
+	  default_config :additional_disks: {}
       default_config :enable_guest_services
       default_config :vm_note
       default_config :resize_vhd
