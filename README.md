@@ -92,6 +92,10 @@ driver:
 * copy_vm_files
   * An array of hashes (`source` and `dest`) of files or directories to copy over to the sytem under test.
   * example: 
+* static_mac_address
+  * String value specifying a static MAC Address to be set at virtual machine creation time.  
+  * Hyper-V will automatically assign a valid dynamic address if your input doesn't give a valid MAC Address.  
+  * example: static_mac_address: '00155d123456'
   
 ```
 driver:
