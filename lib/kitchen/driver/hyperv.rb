@@ -113,7 +113,14 @@ module Kitchen
       end
 
       def create_new_differencing_disk
-        return if File.exist? differencing_disk_path
+        if File.exist? differencing_disk_path
+          if vm_exists_silent
+            return
+          else
+            info ('Found existing differencing disk with no existing VM.  Removing differencing disk.')
+            FileUtils.rm(differencing_disk_path)
+          end
+        end
         info("Creating differencing disk for #{instance.name}.")
         run_ps new_differencing_disk_ps
         info("Created differencing disk for #{instance.name}.")
@@ -201,6 +208,13 @@ module Kitchen
         existing_vm = run_ps ensure_vm_running_ps
         return false if existing_vm.nil? || existing_vm['Id'].nil?
         info("Found an exising VM with an ID: #{existing_vm['Id']}")
+        true
+      end
+
+      def vm_exists_silent
+        return false unless @state.key?(:id) && !@state[:id].nil?
+        existing_vm = run_ps ensure_vm_running_ps
+        return false if existing_vm.nil? || existing_vm['Id'].nil?
         true
       end
 
