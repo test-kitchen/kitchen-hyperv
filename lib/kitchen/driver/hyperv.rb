@@ -77,6 +77,9 @@ module Kitchen
 
       def destroy(state)
         @state = state
+        if differencing_disk_exists && !vm_exists_silent
+          remove_differencing_disk
+        end
         return unless vm_exists
         instance.transport.connection(state).close
         remove_virtual_machine
@@ -113,14 +116,6 @@ module Kitchen
       end
 
       def create_new_differencing_disk
-        if File.exist? differencing_disk_path
-          if vm_exists_silent
-            return
-          else
-            info ('Found existing differencing disk with no existing VM.  Removing differencing disk.')
-            FileUtils.rm(differencing_disk_path)
-          end
-        end
         info("Creating differencing disk for #{instance.name}.")
         run_ps new_differencing_disk_ps
         info("Created differencing disk for #{instance.name}.")
@@ -211,10 +206,17 @@ module Kitchen
         true
       end
 
+      # Used in testing if a stale diff disk exists.  Silent so the output doesn't
+      # appear twice on the kitchen destroy command for the second check for vm_exists
       def vm_exists_silent
         return false unless @state.key?(:id) && !@state[:id].nil?
         existing_vm = run_ps ensure_vm_running_ps
         return false if existing_vm.nil? || existing_vm['Id'].nil?
+        true
+      end
+
+      def differencing_disk_exists
+        return unless File.exist? differencing_disk_path
         true
       end
 
