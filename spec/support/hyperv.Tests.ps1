@@ -173,20 +173,20 @@ Describe "New-KitchenVM with StaticMacAddress" {
     Mock Start-VM
 
     Context "When StaticMacAddress is not specified" {
-        New-KitchenVM
+        New-KitchenVM -StaticMacAddress ""
 
         It "Should not set the StaticMacAddress for the VM" {
-            Assert-MockCalled Set-VMNetworkAdapter -Times 0
+            Assert-MockCalled Set-VMNetworkAdapter -Times 1
         }
     }
 
     Context "When StaticMacAddress is specified" {
-        $testStaticMacAddress = $StaticMacAddress
-        New-KitchenVM -StaticMacAddress $StaticMacAddress
+        $testStaticMacAddress = "00155D01B532"
+        New-KitchenVM -StaticMacAddress $testStaticMacAddress
 
         It "Should set the StaticMacAddress for the VM" {
             Assert-MockCalled Set-VMNetworkAdapter -Times 1 -ParameterFilter {
-                $VM -eq $null -and 
+                $VM -eq $VM.VMName -and 
                 $StaticMacAddress -eq $testStaticMacAddress
             }
         }
