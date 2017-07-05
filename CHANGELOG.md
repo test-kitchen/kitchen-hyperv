@@ -1,5 +1,30 @@
 # Change Log
 
+## [v0.5.0](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.0) (2017-07-05)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.4.1...v0.5.0)
+
+**Merged pull requests:**
+
+- Fixed issue with existing stale diff disk [\#53](https://github.com/test-kitchen/kitchen-hyperv/pull/53) ([jdoores](https://github.com/jdoores))
+- Added static\_mac\_address feature [\#52](https://github.com/test-kitchen/kitchen-hyperv/pull/52) ([jdoores](https://github.com/jdoores))
+
+## [v0.4.1](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.4.1) (2017-03-29)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.4.0...v0.4.1)
+
+**Merged pull requests:**
+
+- Fix error when no additional disks [\#48](https://github.com/test-kitchen/kitchen-hyperv/pull/48) ([smurawski](https://github.com/smurawski))
+
+## [v0.4.0](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.4.0) (2017-03-24)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.3.0...v0.4.0)
+
+**Merged pull requests:**
+
+- Feature/disable secureboot [\#44](https://github.com/test-kitchen/kitchen-hyperv/pull/44) ([smastrorocco](https://github.com/smastrorocco))
+- Feature/additional disk [\#43](https://github.com/test-kitchen/kitchen-hyperv/pull/43) ([smastrorocco](https://github.com/smastrorocco))
+- Feature/vlan support [\#41](https://github.com/test-kitchen/kitchen-hyperv/pull/41) ([smastrorocco](https://github.com/smastrorocco))
+- Add ability to resize a the VHD when the disk is created [\#40](https://github.com/test-kitchen/kitchen-hyperv/pull/40) ([watsonlu](https://github.com/watsonlu))
+
 ## [v0.3.0](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.3.0) (2016-11-28)
 [Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.2.3...v0.3.0)
 
