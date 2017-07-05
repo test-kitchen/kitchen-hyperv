@@ -59,6 +59,7 @@ function New-KitchenVM {
         $Generation = 1,
         $DisableSecureBoot,
         $MemoryStartupBytes,
+        $StaticMacAddress,
         $Name,
         $Path,
         $VHDPath,
@@ -74,6 +75,7 @@ function New-KitchenVM {
     )
     $null = $psboundparameters.remove('DisableSecureBoot')    
     $null = $psboundparameters.remove('ProcessorCount')
+    $null = $psboundparameters.remove('StaticMacAddress') 
     $null = $psboundparameters.remove('UseDynamicMemory')
     $null = $psboundparameters.remove('DynamicMemoryMinBytes')
     $null = $psboundparameters.remove('DynamicMemoryMaxBytes')
@@ -96,6 +98,9 @@ function New-KitchenVM {
     }
     if (-not [string]::IsNullOrEmpty($boot_iso_path)) {
         Mount-VMISO -Id $vm.Id -Path $boot_iso_path
+    }
+    if ($StaticMacAddress -ne $null) {
+        Set-VMNetworkAdapter -VMName $vm.VMName -StaticMacAddress $StaticMacAddress
     }
     if ($EnableGuestServices -and (Get-command Enable-VMIntegrationService -ErrorAction SilentlyContinue)) {
         Enable-VMIntegrationService -VM $vm -Name 'Guest Service Interface'

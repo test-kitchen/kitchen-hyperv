@@ -112,6 +112,7 @@ module Kitchen
             Generation = #{config[:vm_generation]}
             DisableSecureBoot = "#{config[:disable_secureboot]}"
             MemoryStartupBytes = #{config[:memory_startup_bytes]}
+            StaticMacAddress = "#{config[:static_mac_address]}"
             Name = "#{instance.name}"
             Path = "#{kitchen_vm_path}"
             VHDPath = "#{differencing_disk_path}"

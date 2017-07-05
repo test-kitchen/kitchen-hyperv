@@ -158,3 +158,37 @@ Describe "New-KitchenVM with DisableSecureBoot" {
         }
     }
 }
+
+Describe "New-KitchenVM with StaticMacAddress" {
+    function New-VM {}
+    function Set-VM {}
+    function Set-VMMemory {}
+    function Set-VMNetworkAdapter {param ($VM, $StaticMacAddress)}
+    function Start-VM {}
+  
+    Mock New-VM
+    Mock Set-VM
+    Mock Set-VMMemory
+    Mock Set-VMNetworkAdapter
+    Mock Start-VM
+
+    Context "When StaticMacAddress is not specified" {
+        New-KitchenVM -StaticMacAddress ""
+
+        It "Should not set the StaticMacAddress for the VM" {
+            Assert-MockCalled Set-VMNetworkAdapter -Times 1
+        }
+    }
+
+    Context "When StaticMacAddress is specified" {
+        $testStaticMacAddress = "00155D01B532"
+        New-KitchenVM -StaticMacAddress $testStaticMacAddress
+
+        It "Should set the StaticMacAddress for the VM" {
+            Assert-MockCalled Set-VMNetworkAdapter -Times 1 -ParameterFilter {
+                $VM -eq $VM.VMName -and 
+                $StaticMacAddress -eq $testStaticMacAddress
+            }
+        }
+    }
+}

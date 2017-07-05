@@ -101,6 +101,11 @@ driver:
       dest: c:/users/administrator/appdata/local/temp/chef-client-12.19.36-1-x64.msi
 ```
 
+* static_mac_address
+  * String value specifying a static MAC Address to be set at virtual machine creation time.  
+  * Hyper-V will automatically assign a valid dynamic address if your input doesn't give a valid MAC Address.  
+  * example: `static_mac_address: '00155d123456'`
+
 
 ## Image Configuration
 
