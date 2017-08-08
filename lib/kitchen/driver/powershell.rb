@@ -179,7 +179,7 @@ module Kitchen
 
       def resize_vhd
         <<-VMNOTE
-          Resize-VHD -Path "#{parent_vhd_path}" -Size #{config[:resize_vhd]}
+          Resize-VHD -Path "#{parent_vhd_path}" -SizeBytes #{config[:resize_vhd]}
         VMNOTE
       end
 
