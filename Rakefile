@@ -13,13 +13,6 @@ end
 desc "Run all test suites"
 task :test => [:unit]
 
-desc "Display LOC stats"
-task :stats do
-  puts "\n## Production Code Stats"
-  sh "countloc -r lib"
-  puts "\n## Test Code Stats"
-  sh "countloc -r spec"
-end
 
 task :default => [:test]
 

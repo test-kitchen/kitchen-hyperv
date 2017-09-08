@@ -1,10 +1,18 @@
 # Change Log
 
+## [v0.5.1](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.1) (2017-09-08)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.0...v0.5.1)
+
+**Merged pull requests:**
+
+- Change resize\_vhd parameter to -SizeBytes [\#58](https://github.com/test-kitchen/kitchen-hyperv/pull/58) ([jdoores](https://github.com/jdoores))
+
 ## [v0.5.0](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.0) (2017-07-05)
 [Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.4.1...v0.5.0)
 
 **Merged pull requests:**
 
+- version bump and changelog for v0.5.0 [\#55](https://github.com/test-kitchen/kitchen-hyperv/pull/55) ([smurawski](https://github.com/smurawski))
 - Fixed issue with existing stale diff disk [\#53](https://github.com/test-kitchen/kitchen-hyperv/pull/53) ([jdoores](https://github.com/jdoores))
 - Added static\_mac\_address feature [\#52](https://github.com/test-kitchen/kitchen-hyperv/pull/52) ([jdoores](https://github.com/jdoores))
 
