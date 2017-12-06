@@ -167,7 +167,7 @@ module Kitchen
 
       def vm_default_switch_ps
         <<-VMSWITCH
-          Get-DefaultVMSwitch #{config[:vm_switch]} | ConvertTo-Json
+          Get-DefaultVMSwitch "#{config[:vm_switch]}" | ConvertTo-Json
         VMSWITCH
       end
 
