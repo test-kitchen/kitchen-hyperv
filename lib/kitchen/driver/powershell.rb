@@ -189,6 +189,12 @@ module Kitchen
         VMNOTE
       end
 
+      def vm_generation_ps
+        <<-VMGENERATION
+          Get-VMGeneration -ParentPath "#{parent_vhd_path}" | ConvertTo-Json
+        VMGENERATION
+      end
+
       def copy_vm_file_ps(source, dest)
         <<-FILECOPY
           Function CopyFile ($VM, [string]$SourcePath, [string]$DestPath) {

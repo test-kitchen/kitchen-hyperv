@@ -25,12 +25,9 @@ require 'fileutils'
 require 'JSON'
 
 module Kitchen
-
   module Driver
-
     # Driver for Hyper-V
     class Hyperv < Kitchen::Driver::Base
-
       kitchen_driver_api_version 2
       plugin_version Kitchen::Driver::HYPERV_VERSION
 
@@ -53,7 +50,7 @@ module Kitchen
       default_config :vm_note
       default_config :resize_vhd
       default_config :additional_disks
-      default_config :vm_generation, 1
+      default_config :vm_generation
       default_config :disable_secureboot, false
       default_config :static_mac_address
       default_config :disk_type do |driver|
@@ -113,6 +110,9 @@ module Kitchen
           vm_vlan_id_warning = "vm_vlan_id (#{vm_vlan_id}) must be a valid 802.1Q" \
                                " VLAN ID between (#{vm_vlan_id_min}-#{vm_vlan_id_max})"
           raise vm_vlan_id_warning unless vm_vlan_id_valid
+        end
+        if config[:vm_generation].nil?
+          set_vm_generation
         end
       end
 
@@ -245,6 +245,14 @@ module Kitchen
             info("Removed additional disk #{additional_disk[:name]} for #{instance.name}.")
           end
         end
+      end
+
+      def set_vm_generation
+        vm_generation_object = run_ps vm_generation_ps
+        if vm_generation_object.nil? #|| vm_generation_object['Generation'].nil?
+          raise 'No Generation Returned'
+        end
+        config[:vm_generation] = vm_generation_object['Generation']
       end
 
       def kitchen_vm_path
