@@ -54,7 +54,7 @@ driver:
 * boot_iso_path
   * Path on the host to the ISO to mount before starting the VMs.
 * vm_generation
-  * The generation for the hyper-v VM.  Defaults to 1.
+  * The generation for the hyper-v VM.  Defaults to 1 if not specified or no parent VM generation found.
 * disable_secureboot
   * Boolean.  If true, will disable secure boot for the VM.  Only applies if `vm_generation=2`.  Defaults to false.
 * enable_guest_services

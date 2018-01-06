@@ -249,8 +249,9 @@ module Kitchen
 
       def set_vm_generation
         vm_generation_object = run_ps vm_generation_ps
-        if vm_generation_object.nil? #|| vm_generation_object['Generation'].nil?
-          raise 'No Generation Returned'
+        if vm_generation_object.nil?
+          info("Didn't find a parent VM generation, defaulting to 1")
+          config[:vm_generation] = 1
         end
         config[:vm_generation] = vm_generation_object['Generation']
       end
