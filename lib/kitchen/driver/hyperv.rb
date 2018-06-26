@@ -22,7 +22,7 @@ require 'kitchen/driver/hyperv_version'
 require 'kitchen/driver/powershell'
 require 'mixlib/shellout'
 require 'fileutils'
-require 'JSON'
+require 'json'
 
 module Kitchen
 
