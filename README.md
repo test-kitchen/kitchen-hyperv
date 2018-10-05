@@ -90,7 +90,7 @@ driver:
 * vm_note
   * A note to add to the VM's note field. Defaults to empty.
 * copy_vm_files
-  * An array of hashes (`source` and `dest`) of files or directories to copy over to the sytem under test.
+  * An array of hashes (`source` and `dest`) of files or directories to copy over to the system under test. Requires enable_guest_services to be true.
   * example: 
   
 ```
