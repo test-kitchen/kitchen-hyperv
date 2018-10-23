@@ -1,7 +1,8 @@
 [![Gem Version](https://badge.fury.io/rb/kitchen-hyperv.svg)](http://badge.fury.io/rb/kitchen-hyperv)
 # Kitchen::Hyperv
 
-TODO: Write a gem description
+This is a [Test Kitchen](https://github.com/test-kitchen/test-kitchen)
+driver for Microsoft Hyper-V.
 
 ## Installation
 
