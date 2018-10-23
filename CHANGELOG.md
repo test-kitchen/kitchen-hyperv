@@ -1,5 +1,14 @@
 # Change Log
 
+## [v0.5.2](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.2) (2018-10-23)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.1...v0.5.2)
+
+**Merged pull requests:**
+
+- Trim dev deps from the gem and fix license [\#70](https://github.com/test-kitchen/kitchen-hyperv/pull/70) ([tas50](https://github.com/tas50))
+- Updated readme - copy_vm_files requires guest services [\#66](https://github.com/test-kitchen/kitchen-hyperv/pull/66) ([aseverns](https://github.com/aseverns))
+- Fix case sensitivity issue in require [\#67](https://github.com/test-kitchen/kitchen-hyperv/pull/67) ([ ddaymn ](https://github.com/ddaymn))
+
 ## [v0.5.1](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.1) (2017-09-08)
 [Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.0...v0.5.1)
 
