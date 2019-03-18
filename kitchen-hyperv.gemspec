@@ -15,17 +15,16 @@ Gem::Specification.new do |spec|
   spec.license       = "Apache-2.0"
 
   spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR).grep(/LICENSE|^lib|^support/)
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 1.7"
+  spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "pry", "~> 0.10"
+  spec.add_development_dependency "pry"
   spec.add_development_dependency "cane"
   spec.add_development_dependency "finstyle"
   spec.add_development_dependency "rubocop"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "countloc"
 
-  spec.add_dependency "test-kitchen", "~> 1.4"
+  spec.add_dependency "test-kitchen", ">= 1.4", "< 3"
 end
