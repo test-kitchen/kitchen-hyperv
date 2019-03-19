@@ -41,7 +41,12 @@ describe Kitchen::Driver::Hyperv do
   let(:state)         { Hash.new }
   let(:env)           { Hash.new }
 
-  let(:driver_object) { Kitchen::Driver::Hyperv.new(config) }
+  let(:instance) do
+    stub(name: "coolbeans", logger: logger, to_str: "instance")
+  end
+
+
+  let(:driver_object) { Kitchen::Driver::Hyperv.new(config).finalize_config!(instance) }
 
   let(:driver) do
     d = driver_object
@@ -49,18 +54,6 @@ describe Kitchen::Driver::Hyperv do
     d
   end
 
-  let(:instance) do
-    Kitchen::Instance.new(
-      :verifier => verifier,
-      :driver => driver_object,
-      :logger => logger,
-      :suite => suite,
-      :platform => platform,
-      :provisioner => provisioner,
-      :transport => transport,
-      :state_file => state_file
-    )
-  end
 
   #before { stub_const("ENV", env) }
 

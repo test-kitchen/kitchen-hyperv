@@ -25,6 +25,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "countloc"
+  spec.add_development_dependency "minitest-stub-const"
+  spec.add_development_dependency "mocha"
 
   spec.add_dependency "test-kitchen", ">= 1.4", "< 3"
 end

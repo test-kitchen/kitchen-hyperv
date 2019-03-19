@@ -1,0 +1,47 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+pr:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+
+- powershell: |
+    install-module -Name Pester -AllowClobber -Force -SkipPublisherCheck -scope CurrentUser
+    invoke-pester ./spec
+  displayName: Run Pester Tests
+
+- task: UseRubyVersion@0
+  inputs:
+    versionSpec: '>= 2.5'
+
+- script: gem install bundler
+  displayName: 'Install Bundler'
+
+- script: bundle install --retry=3 --jobs=4
+  displayName: 'bundle install'
+
+- script: bundle exec rake
+  displayName: 'bundle exec rake'
+
+- script: bundle exec rake build
+  displayName: 'bundle exec rake build'
+
+- task: CopyFiles@2
+  inputs:
+    contents: '**/pkg/**'
+    targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'drop'
+  condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI'))
