@@ -23,13 +23,13 @@ driver:
 
 ### Required parameters:
 
-#### Driver Parameters
+#### Driver parameters
 * parent_vhd_folder
   * Location of the base vhd files
 * parent_vhd_name
   * Vhd file name for the base vhd file
 
-#### Transport Parameters
+#### Transport parameters
 * password
   * Password used to connect to the instance
 
