@@ -156,6 +156,10 @@ module Kitchen
       def set_vm_ipaddress_ps
         <<-VMIP
 
+          while ((Get-VM -id "#{@state[:id]}").NetworkAdapters[0].Status -ne 'Ok'){
+            start-sleep 10
+          }
+          
           (Get-VM -id "#{@state[:id]}").NetworkAdapters |
             Set-VMNetworkConfiguration -ipaddress "#{config[:ip_address]}" `
               -subnet "#{config[:subnet]}" `
