@@ -1,5 +1,13 @@
 # Change Log
 
+## [v0.5.3](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.3) (2019-03-20)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.2...v0.5.3)
+
+- Loosen the Test Kitchen dep to all 2.0 [\#72](https://github.com/test-kitchen/kitchen-hyperv/pull/72) ([tas50](https://github.com/tas50))
+- Update set_vm_ipaddress_ps to wait for "ok" status [\#65](https://github.com/test-kitchen/kitchen-hyperv/pull/65) ([shawnj](https://github.com/shawnj))
+- Disable automatic snaptshots [\#64](https://github.com/test-kitchen/kitchen-hyperv/pull/64) ([ebjornset](https://github.com/ebjornset))
+
+
 ## [v0.5.2](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.2) (2018-10-23)
 [Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.1...v0.5.2)
 
