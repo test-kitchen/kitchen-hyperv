@@ -1,5 +1,9 @@
-[![Gem Version](https://badge.fury.io/rb/kitchen-hyperv.svg)](http://badge.fury.io/rb/kitchen-hyperv)
 # Kitchen::Hyperv
+
+[![Build Status](https://dev.azure.com/test-kitchen/kitchen-hyperv/_apis/build/status/test-kitchen.kitchen-hyperv?branchName=master)](https://dev.azure.com/test-kitchen/kitchen-hyperv/_build/latest?definitionId=1&branchName=master)
+
+[![Gem Version](https://badge.fury.io/rb/kitchen-hyperv.svg)](http://badge.fury.io/rb/kitchen-hyperv)
+
 
 This is a [Test Kitchen](https://github.com/test-kitchen/test-kitchen)
 driver for Microsoft Hyper-V.

@@ -1,4 +1,7 @@
-. $PSScriptRoot\..\..\support\hyperv.ps1
+$OldPSModulePath = "$env:PSModulePath"
+$env:PSModulePath = "$PSScriptRoot/test_modules" + [io.path]::PathSeparator + $env:PSModulePath
+
+. $PSScriptRoot/../../support/hyperv.ps1
 
 describe 'New-DifferencingDisk' {
     mock new-vhd -Verifiable -MockWith {}
@@ -233,3 +236,5 @@ Describe "New-KitchenVM handling of AutomaticCheckpointsEnabled" {
         }
     }
 }
+
+$env:PSModulePath = $OldPSModulePath
