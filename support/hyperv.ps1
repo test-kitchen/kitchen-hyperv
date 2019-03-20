@@ -116,6 +116,9 @@ function New-KitchenVM {
     if ($DisableSecureBoot -and ($Generation -eq 2) -and (Get-command Set-VMFirmware -ErrorAction SilentlyContinue)) {
         Set-VMFirmware -VM $vm -EnableSecureBoot Off
     }
+    if ((Get-Command -Name Set-Vm).Parameters["AutomaticCheckpointsEnabled"]) {
+        Set-VM -Name $vm.VMName -AutomaticCheckpointsEnabled $false
+    }
     $vm | Start-Vm -passthru |
         foreach {
         $vm = $_

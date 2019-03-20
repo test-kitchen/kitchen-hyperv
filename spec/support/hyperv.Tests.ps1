@@ -192,3 +192,44 @@ Describe "New-KitchenVM with StaticMacAddress" {
         }
     }
 }
+
+Describe "New-KitchenVM handling of AutomaticCheckpointsEnabled" {
+    function New-VM {}
+    function Set-VM {param ($Name, $AutomaticCheckpointsEnabled)}
+    function Set-VMMemory {}
+    function Set-VMNetworkAdapter {}
+    function Start-VM {}
+    function Get-Command {param ($Name)}
+
+    Mock New-VM
+    Mock Set-VM
+    Mock Set-VMMemory
+    Mock Set-VMNetworkAdapter
+    Mock Start-VM
+
+    Context "When AutomaticCheckpointsEnabled is supported by Set-VM" {
+        Mock Get-Command -ParameterFilter { $Name -eq "Set-VM" } -MockWith {@{Parameters = @{AutomaticCheckpointsEnabled = "dummy"}}} 
+
+        New-KitchenVM
+
+        It "Should set AutomaticCheckpointsEnabled to false for the VM" {
+            Assert-MockCalled Set-VM -Exactly 1 -ParameterFilter {
+                $Name -eq $VM.VMName -and 
+                $AutomaticCheckpointsEnabled -eq $false
+            }
+        }
+    }
+
+    Context "When AutomaticCheckpointsEnabled is unsupported by Set-VM" {
+        Mock Get-Command -ParameterFilter { $Name -eq "Set-VM" } -MockWith {@{Parameters = @{}}}
+
+        New-KitchenVM
+
+        It "Should not set AutomaticCheckpointsEnabled for the VM" {
+            Assert-MockCalled Set-VM -Exactly 0 -ParameterFilter {
+                $Name -eq $VM.VMName -and 
+                $AutomaticCheckpointsEnabled -eq $false
+            }
+        }
+    }
+}
