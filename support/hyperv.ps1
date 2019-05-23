@@ -53,6 +53,31 @@ function Assert-VmRunning {
     $Output
 }
 
+function Get-VMGeneration {
+    [cmdletbinding()]
+    param(
+        [parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]    
+        [string[]]$ParentPath
+    )
+
+    $parent_location = "$ParentPath"
+    $parent_location = $parent_location.Replace("/", "\")
+    $virtualMachines = Get-VM | Select-Object Name, Generation, VMId
+
+    ForEach ($vm in $virtualMachines) {
+        $vhd = $vm.VMId | Get-VHD
+
+        if (($vhd.Path -eq $parent_location) -or ($vhd.ParentPath -eq $parent_location)) {
+            $parentVM = $vm.Name
+            $Output = Get-VM -Name $parentVM | Select-Object Generation
+            break
+        }
+    }
+    $Output
+}
+
+
 function New-KitchenVM {
     [cmdletbinding()]
     param (
