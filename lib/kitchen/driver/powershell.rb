@@ -139,8 +139,7 @@ module Kitchen
 
       def vm_details_ps
         <<-DETAILS
-
-          Get-VmDetail -id "#{@state[:id]}" | ConvertTo-Json
+        Get-VMNetworkAdapter -VMName "#{instance.name}" | ConvertTo-Json
         DETAILS
       end
 

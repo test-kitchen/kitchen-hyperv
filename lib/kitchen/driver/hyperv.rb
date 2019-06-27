@@ -159,9 +159,10 @@ module Kitchen
 
       def update_state
         vm_details
-        @state[:id] = @vm['Id']
-        @state[:hostname] = @vm['IpAddress']
-        @state[:vm_name] = @vm['Name']
+        @state[:id] = @vm['VMId']
+        # First address should be IPv4, may want to validate this or add config option
+        @state[:hostname] = @vm['IPAddresses'][0]
+        @state[:vm_name] = @vm['VMName']
       end
 
       def vm_details
