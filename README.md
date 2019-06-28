@@ -123,6 +123,10 @@ driver:
  
 * Guest VMs should have the latest Integration Components installed.  See https://support.microsoft.com/en-us/help/3063109/hyper-v-integration-components-update-for-windows-virtual-machines-that-are-running-on-a-windows-10-based-host
 
+ Ubuntu and other Linux virtual machines may require installation of cloud tools to allow Hyper-V to determine the virtual machine's IP.
+
+* Resolved by installing linux cloud tools. See https://stackoverflow.com/a/33059342
+
 ## Contributing
 
 1. Fork it ( https://github.com/[my-github-username]/kitchen-hyperv/fork )
