@@ -1,6 +1,6 @@
 # Kitchen::Hyperv
 
-[![Build Status](https://dev.azure.com/test-kitchen/kitchen-hyperv/_apis/build/status/test-kitchen.kitchen-hyperv?branchName=master)](https://dev.azure.com/test-kitchen/kitchen-hyperv/_build/latest?definitionId=1&branchName=master)
+[![Build Status](https://dev.azure.com/test-kitchen/kitchen-hyperv/_apis/build/status/test-kitchen.kitchen-hyperv%20(1)?branchName=master)](https://dev.azure.com/test-kitchen/kitchen-hyperv/_build/latest?definitionId=5&branchName=master)
 
 [![Gem Version](https://badge.fury.io/rb/kitchen-hyperv.svg)](http://badge.fury.io/rb/kitchen-hyperv)
 
