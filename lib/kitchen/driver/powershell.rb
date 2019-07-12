@@ -15,28 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'mixlib/shellout'
-require 'fileutils'
-require 'json'
+require "mixlib/shellout"
+require "fileutils"
+require "json"
 
 module Kitchen
   module Driver
     module PowerShellScripts
       def encode_command(script)
-        encoded_script = script.encode('UTF-16LE', 'UTF-8')
+        encoded_script = script.encode("UTF-16LE", "UTF-8")
         Base64.strict_encode64(encoded_script)
       end
 
       def is_64bit?
-        os_arch = ENV['PROCESSOR_ARCHITEW6432'] || ENV['PROCESSOR_ARCHITECTURE']
-        ruby_arch = ['foo'].pack('p').size == 4 ? 32 : 64
-        os_arch == 'AMD64' && ruby_arch == 64
+        os_arch = ENV["PROCESSOR_ARCHITEW6432"] || ENV["PROCESSOR_ARCHITECTURE"]
+        ruby_arch = ["foo"].pack("p").size == 4 ? 32 : 64
+        os_arch == "AMD64" && ruby_arch == 64
       end
 
       def is_32bit?
-        os_arch = ENV['PROCESSOR_ARCHITEW6432'] || ENV['PROCESSOR_ARCHITECTURE']
-        ruby_arch = ['foo'].pack('p').size == 4 ? 32 : 64
-        os_arch != 'AMD64' && ruby_arch == 32
+        os_arch = ENV["PROCESSOR_ARCHITEW6432"] || ENV["PROCESSOR_ARCHITECTURE"]
+        ruby_arch = ["foo"].pack("p").size == 4 ? 32 : 64
+        os_arch != "AMD64" && ruby_arch == 32
       end
 
       def powershell_64_bit
@@ -48,7 +48,7 @@ module Kitchen
       end
 
       def wrap_command(script)
-        base_script_path = File.join(File.dirname(__FILE__), '/../../../support/hyperv.ps1')
+        base_script_path = File.join(File.dirname(__FILE__), "/../../../support/hyperv.ps1")
         debug("Loading functions from #{base_script_path}")
         new_script = [ ". #{base_script_path}", "#{script}" ].join(";\n")
         debug("Wrapped script: #{new_script}")
@@ -64,7 +64,7 @@ module Kitchen
       # @api private
       def run_ps(cmd, options = {})
         cmd = "echo #{cmd}" if config[:dry_run]
-        debug('Preparing to run: ')
+        debug("Preparing to run: ")
         debug("  #{cmd}")
         wrapped_command = wrap_command cmd
         execute_command wrapped_command, options
@@ -76,6 +76,7 @@ module Kitchen
         sh.run_command
         debug("Local Command END #{Util.duration(sh.execution_time)}")
         raise "Failed: #{sh.stderr}" if sh.error?
+
         stdout = sanitize_stdout(sh.stdout)
         JSON.parse(stdout) if stdout.length > 2
       end
@@ -117,7 +118,7 @@ module Kitchen
             Path = "#{kitchen_vm_path}"
             VHDPath = "#{differencing_disk_path}"
             SwitchName = "#{config[:vm_switch]}"
-            VlanId = #{config[:vm_vlan_id] || '$null'}
+            VlanId = #{config[:vm_vlan_id] || "$null"}
             ProcessorCount = #{config[:processor_count]}
             UseDynamicMemory = "#{config[:dynamic_memory]}"
             DynamicMemoryMinBytes = #{config[:dynamic_memory_min_bytes]}
@@ -132,6 +133,7 @@ module Kitchen
 
       def additional_disks
         return if config[:additional_disks].nil?
+
         <<-EOH
         AdditionalDisks = @("#{@additional_disk_objects.join('","')}")
         EOH
@@ -159,7 +161,7 @@ module Kitchen
           while ((Get-VM -id "#{@state[:id]}").NetworkAdapters[0].Status -ne 'Ok'){
             start-sleep 10
           }
-          
+
           (Get-VM -id "#{@state[:id]}").NetworkAdapters |
             Set-VMNetworkConfiguration -ipaddress "#{config[:ip_address]}" `
               -subnet "#{config[:subnet]}" `
@@ -233,7 +235,8 @@ module Kitchen
 
       def ruby_array_to_ps_array(list)
         return "@()" if list.nil? || list.empty?
-        list.to_s.tr('[]','()').prepend('@')
+
+        list.to_s.tr("[]", "()").prepend("@")
       end
     end
   end
