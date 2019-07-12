@@ -11,11 +11,29 @@ Rake::TestTask.new(:unit) do |t|
 end
 
 desc "Run all test suites"
-task :test => [:unit]
+task test: :unit
 
+begin
+  require "chefstyle"
+  require "rubocop/rake_task"
+  RuboCop::RakeTask.new(:style) do |task|
+    task.options += ["--display-cop-names", "--no-color"]
+  end
+rescue LoadError
+  puts "chefstyle is not available. (sudo) gem install chefstyle to do style checking."
+end
 
-task :default => [:test]
+desc "Run all quality tasks"
+task quality: :style
 
+begin
+  require "yard"
+  YARD::Rake::YardocTask.new
+rescue LoadError
+  puts "yard is not available. (sudo) gem install yard to generate yard documentation."
+end
+
+task default: %i{test quality}
 begin
   require "github_changelog_generator/task"
 
@@ -23,8 +41,8 @@ begin
     config.future_release = "v#{Kitchen::Driver::HYPERV_VERSION}"
     config.issues = false
     config.pulls = true
-    config.user = 'test-kitchen'
-    config.project = 'kitchen-hyperv'
+    config.user = "test-kitchen"
+    config.project = "kitchen-hyperv"
   end
 rescue LoadError
   puts "github_changelog_generator is not available. " \

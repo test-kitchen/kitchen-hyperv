@@ -21,7 +21,7 @@ require_relative "../../spec_helper"
 require "logger"
 require "stringio"
 require "kitchen"
-require 'kitchen/driver/hyperv_version'
+require "kitchen/driver/hyperv_version"
 require "kitchen/driver/hyperv"
 require "kitchen/provisioner/dummy"
 require "kitchen/transport/dummy"
@@ -31,20 +31,19 @@ describe Kitchen::Driver::Hyperv do
 
   let(:logged_output) { StringIO.new }
   let(:logger)        { Logger.new(logged_output) }
-  let(:config)        { { :kitchen_root => "c:/test_root" } }
-  let(:platform)      { Kitchen::Platform.new(:name => "fooos-99") }
-  let(:suite)         { Kitchen::Suite.new(:name => "suitey") }
+  let(:config)        { { kitchen_root: "c:/test_root" } }
+  let(:platform)      { Kitchen::Platform.new(name: "fooos-99") }
+  let(:suite)         { Kitchen::Suite.new(name: "suitey") }
   let(:verifier)      { Kitchen::Verifier::Dummy.new }
   let(:provisioner)   { Kitchen::Provisioner::Dummy.new }
   let(:transport)     { Kitchen::Transport::Dummy.new }
   let(:state_file)    { stub("state_file") }
-  let(:state)         { Hash.new }
-  let(:env)           { Hash.new }
+  let(:state)         { {} }
+  let(:env)           { {} }
 
   let(:instance) do
     stub(name: "coolbeans", logger: logger, to_str: "instance")
   end
-
 
   let(:driver_object) { Kitchen::Driver::Hyperv.new(config).finalize_config!(instance) }
 
@@ -54,10 +53,9 @@ describe Kitchen::Driver::Hyperv do
     d
   end
 
+  # before { stub_const("ENV", env) }
 
-  #before { stub_const("ENV", env) }
-
-  it 'driver api_version is 2' do
+  it "driver api_version is 2" do
     driver.diagnose_plugin[:api_version].must_equal(2)
   end
 end

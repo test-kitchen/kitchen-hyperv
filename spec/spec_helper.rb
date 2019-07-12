@@ -36,8 +36,8 @@ elsif ENV["COVERAGE"]
   SimpleCov.start "gem"
 end
 
-require 'minitest'
-require 'minitest/stub_const'
+require "minitest"
+require "minitest/stub_const"
 require "minitest/autorun"
 require "mocha/setup"
 require "tempfile"
