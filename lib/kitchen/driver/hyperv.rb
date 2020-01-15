@@ -18,8 +18,8 @@
 
 require "kitchen"
 require "kitchen/driver"
-require "kitchen/driver/hyperv_version"
-require "kitchen/driver/powershell"
+require_relative "hyperv_version"
+require_relative "powershell"
 require "mixlib/shellout"
 require "fileutils"
 require "json"
