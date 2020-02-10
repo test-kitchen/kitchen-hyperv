@@ -10,6 +10,12 @@ driver for Microsoft Hyper-V.
 
 ## Installation
 
+Make sure you have hyper-v installed on your system first:
+
+```powershell
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
+```
+
 Add this line to your application's Gemfile:
 
 ```ruby
