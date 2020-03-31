@@ -4,7 +4,6 @@
 
 [![Gem Version](https://badge.fury.io/rb/kitchen-hyperv.svg)](http://badge.fury.io/rb/kitchen-hyperv)
 
-
 This is a [Test Kitchen](https://github.com/test-kitchen/test-kitchen)
 driver for Microsoft Hyper-V.
 
@@ -31,19 +30,21 @@ driver:
   name: 'hyperv'
 ```
 
-### Required parameters:
+### Required parameters
 
 #### Driver parameters
+
 * parent_vhd_folder
   * Location of the base vhd files
 * parent_vhd_name
   * Vhd file name for the base vhd file
 
 #### Transport parameters
+
 * password
   * Password used to connect to the instance
 
-### Optional parameters:
+### Optional parameters
 
 * memory_startup_bytes
   * amount of RAM to assign to each virtual machine.  Defaults to 536,870,912.
@@ -89,7 +90,7 @@ driver:
       * Integer. If not provided, will default to 5.
     * type
       * The type of virtual disk to create, .VHD or .VHDX.  Defaults to the file extension of the parent virtual hard drive.
-  * Example: 
+  * Example:
   
 ```yaml
 driver:
@@ -103,13 +104,14 @@ driver:
       size_gb: 50
       type: .VHD
 ```
+
 * vm_note
   * A note to add to the VM's note field. Defaults to empty.
 * copy_vm_files
   * An array of hashes (`source` and `dest`) of files or directories to copy over to the system under test. Requires enable_guest_services to be true.
-  * example: 
+  * example:
   
-```
+```yaml
 driver:
   name: hyperv
   copy_vm_files:
@@ -122,20 +124,19 @@ driver:
   * Hyper-V will automatically assign a valid dynamic address if your input doesn't give a valid MAC Address.  
   * example: `static_mac_address: '00155d123456'`
 
-
 ## Image Configuration
 
  The following changes need to be made to a Windows image that is going to be used for testing.  This is not an exhaustive list and, your milage may vary.
- 
-* Guest VMs should have the latest Integration Components installed.  See https://support.microsoft.com/en-us/help/3063109/hyper-v-integration-components-update-for-windows-virtual-machines-that-are-running-on-a-windows-10-based-host
+
+* Guest VMs should have the latest Integration Components installed.  See <https://support.microsoft.com/en-us/help/3063109/hyper-v-integration-components-update-for-windows-virtual-machines-that-are-running-on-a-windows-10-based-host>
 
  Ubuntu and other Linux virtual machines may require installation of cloud tools to allow Hyper-V to determine the virtual machine's IP.
 
-* Resolved by installing linux cloud tools. See https://stackoverflow.com/a/33059342
+* Resolved by installing linux cloud tools. See <https://stackoverflow.com/a/33059342>
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/kitchen-hyperv/fork )
+1. Fork it ( <https://github.com/[my-github-username]/kitchen-hyperv/fork> )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
