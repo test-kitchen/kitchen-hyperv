@@ -1,5 +1,15 @@
 # Change Log
 
+## [v0.5.4](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.4) (2019-05-06)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.3...v0.5.4)
+
+- Added quotes around variable for Get-DefaultVMSwitch to prevent failures. Thanks @kdoores
+- Misc readme updates
+- Apply Chefstyle to the repo and setup Azure Devops Pipelines for CI
+- Allow testing on newer versions of minitest
+- Use the latest github_changelog_generator for releases
+- Switch require to require_relative to speed up Ruby requires
+
 ## [v0.5.3](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.3) (2019-03-20)
 [Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.2...v0.5.3)
 
