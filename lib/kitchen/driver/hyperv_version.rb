@@ -17,6 +17,6 @@
 
 module Kitchen
   module Driver
-    HYPERV_VERSION = "0.5.4".freeze
+    HYPERV_VERSION = "0.5.5".freeze
   end
 end

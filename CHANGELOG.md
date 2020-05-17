@@ -1,5 +1,10 @@
 # Change Log
 
+## [v0.5.5](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.5) (2019-05-17)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.4...v0.5.5)
+
+- Make sure all the library files ship with the gem artifact
+
 ## [v0.5.4](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.4) (2019-05-06)
 [Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.3...v0.5.4)
 
