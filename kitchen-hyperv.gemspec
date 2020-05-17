@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/test-kitchen/kitchen-hyperv"
   spec.license       = "Apache-2.0"
 
-  spec.files         = %w{LICENSE kitchen-hyperv.gemspec Gemfile Rakefile support/hyperv.ps1}
+  spec.files         = %w{LICENSE kitchen-hyperv.gemspec Gemfile Rakefile support/hyperv.ps1} + Dir.glob("lib/**/*")
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler"
