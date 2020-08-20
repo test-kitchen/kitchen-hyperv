@@ -20,9 +20,9 @@ require "kitchen"
 require "kitchen/driver"
 require_relative "hyperv_version"
 require_relative "powershell"
-require "mixlib/shellout"
-require "fileutils"
-require "json"
+require "mixlib/shellout" unless defined?(Mixlib::ShellOut)
+require "fileutils" unless defined?(FileUtils)
+require "json" unless defined?(JSON)
 
 module Kitchen
 

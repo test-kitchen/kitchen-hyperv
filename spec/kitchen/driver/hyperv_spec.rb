@@ -19,7 +19,7 @@
 require_relative "../../spec_helper"
 
 require "logger"
-require "stringio"
+require "stringio" unless defined?(StringIO)
 require "kitchen"
 require "kitchen/driver/hyperv_version"
 require "kitchen/driver/hyperv"
