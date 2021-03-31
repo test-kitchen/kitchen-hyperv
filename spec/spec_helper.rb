@@ -1,5 +1,4 @@
-# -*- encoding: utf-8 -*-
-#
+
 # Author:: Fletcher Nichol (<fnichol@nichol.ca>)
 #
 # Copyright (C) 2012, Fletcher Nichol
@@ -39,5 +38,5 @@ end
 require "minitest"
 require "minitest/stub_const"
 require "minitest/autorun"
-require "mocha/setup"
+require "mocha/minitest"
 require "tempfile" unless defined?(Tempfile)
