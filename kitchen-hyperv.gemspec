@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest-stub-const"
   spec.add_development_dependency "mocha", "~> 1.1"
 
-  spec.add_dependency "test-kitchen", ">= 1.4", "< 3"
+  spec.add_dependency "test-kitchen", ">= 1.4", "< 4"
 end
