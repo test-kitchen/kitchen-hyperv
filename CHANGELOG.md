@@ -1,6 +1,13 @@
 # Change Log
 
-## [v0.5.5](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.5) (2019-05-17)
+## [v0.6.0](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.6.0) (2021-07-02)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.5...v0.6.0)
+
+- Support Test Kitchen 3.0
+- Minor optimizations to Ruby code
+- Removed the bundler and Github Changelog Generator dev deps
+
+## [v0.5.5](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.5.5) (2020-05-17)
 [Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.4...v0.5.5)
 
 - Make sure all the library files ship with the gem artifact
