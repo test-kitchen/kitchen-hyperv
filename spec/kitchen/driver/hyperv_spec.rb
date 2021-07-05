@@ -1,5 +1,3 @@
-# -*- encoding: utf-8 -*-
-#
 # Author:: Fletcher (<fnichol@nichol.ca>)
 #
 # Copyright (C) 2020, Fletcher Nichol
@@ -31,7 +29,7 @@ describe Kitchen::Driver::Hyperv do
 
   let(:logged_output) { StringIO.new }
   let(:logger)        { Logger.new(logged_output) }
-  let(:config)        { { kitchen_root: "c:/test_root" } }
+  let(:config)        { { kitchen_root: "c:/test_root", parent_vhd_folder: "C:/Virtual Machines", parent_vhd_name: "dummy.vhdx" } }
   let(:platform)      { Kitchen::Platform.new(name: "fooos-99") }
   let(:suite)         { Kitchen::Suite.new(name: "suitey") }
   let(:verifier)      { Kitchen::Verifier::Dummy.new }
@@ -56,6 +54,6 @@ describe Kitchen::Driver::Hyperv do
   # before { stub_const("ENV", env) }
 
   it "driver api_version is 2" do
-    driver.diagnose_plugin[:api_version].must_equal(2)
+    _(driver.diagnose_plugin[:api_version]).must_equal(2)
   end
 end

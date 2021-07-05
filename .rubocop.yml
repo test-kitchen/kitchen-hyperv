@@ -1,4 +1,4 @@
-Metrics/LineLength:
+Layout/LineLength:
   Max: 100
 
 Style/Documentation:

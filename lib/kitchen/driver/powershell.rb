@@ -16,6 +16,7 @@
 # limitations under the License.
 
 require "mixlib/shellout" unless defined?(Mixlib::ShellOut)
+require "benchmark" unless defined?(Benchmark)
 require "fileutils" unless defined?(FileUtils)
 require "json" unless defined?(JSON)
 
@@ -28,6 +29,8 @@ module Kitchen
       end
 
       def is_64bit?
+        return true if remote_hyperv
+
         os_arch = ENV["PROCESSOR_ARCHITEW6432"] || ENV["PROCESSOR_ARCHITECTURE"]
         ruby_arch = ["foo"].pack("p").size == 4 ? 32 : 64
         os_arch == "AMD64" && ruby_arch == 64
@@ -48,7 +51,6 @@ module Kitchen
       end
 
       def wrap_command(script)
-        base_script_path = File.join(File.dirname(__FILE__), "/../../../support/hyperv.ps1")
         debug("Loading functions from #{base_script_path}")
         new_script = [ ". #{base_script_path}", "#{script}" ].join(";\n")
         debug("Wrapped script: #{new_script}")
@@ -71,11 +73,15 @@ module Kitchen
       end
 
       def execute_command(cmd, options = {})
-        debug("#Local Command BEGIN (#{cmd})")
-        sh = Mixlib::ShellOut.new(cmd, options)
-        sh.run_command
-        debug("Local Command END #{Util.duration(sh.execution_time)}")
-        raise "Failed: #{sh.stderr}" if sh.error?
+        debug("#Command BEGIN (#{cmd})")
+
+        sh = nil
+        bm = Benchmark.measure do
+          sh = connection.run_command(cmd, options)
+        end
+
+        debug("Command END #{Util.duration(bm.total)}")
+        raise "Failed: #{sh.stderr}" if sh.exit_status != 0
 
         stdout = sanitize_stdout(sh.stdout)
         JSON.parse(stdout) if stdout.length > 2
@@ -113,7 +119,7 @@ module Kitchen
             Generation = #{config[:vm_generation]}
             DisableSecureBoot = "#{config[:disable_secureboot]}"
             MemoryStartupBytes = #{config[:memory_startup_bytes]}
-            StaticMacAddress = "#{config[:static_mac_address]}"
+            StaticMacAddress = "#{config[:static_mac_address].to_s}"
             Name = "#{instance.name}"
             Path = "#{kitchen_vm_path}"
             VHDPath = "#{differencing_disk_path}"
@@ -139,6 +145,7 @@ module Kitchen
         EOH
       end
 
+      # TODO: Report if VM has no IP address instead of silently waiting forever
       def vm_details_ps
         <<-DETAILS
 

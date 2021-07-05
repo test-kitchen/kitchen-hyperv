@@ -18,8 +18,8 @@ function New-DifferencingDisk {
         [parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [string[]]$Path,
-        [parameter(Mandatory)]        
-        [ValidateNotNullOrEmpty()] 
+        [parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$ParentPath
     )
     if (-not (Test-Path $Path)) {
@@ -73,9 +73,9 @@ function New-KitchenVM {
         $EnableGuestServices,
         $AdditionalDisks
     )
-    $null = $psboundparameters.remove('DisableSecureBoot')    
+    $null = $psboundparameters.remove('DisableSecureBoot')
     $null = $psboundparameters.remove('ProcessorCount')
-    $null = $psboundparameters.remove('StaticMacAddress') 
+    $null = $psboundparameters.remove('StaticMacAddress')
     $null = $psboundparameters.remove('UseDynamicMemory')
     $null = $psboundparameters.remove('DynamicMemoryMinBytes')
     $null = $psboundparameters.remove('DynamicMemoryMaxBytes')
@@ -99,7 +99,7 @@ function New-KitchenVM {
     if (-not [string]::IsNullOrEmpty($boot_iso_path)) {
         Mount-VMISO -Id $vm.Id -Path $boot_iso_path
     }
-    if ($StaticMacAddress -ne $null) {
+    if (-not [string]::IsNullOrEmpty($StaticMacAddress)) {
         Set-VMNetworkAdapter -VMName $vm.VMName -StaticMacAddress $StaticMacAddress
     }
     if ($EnableGuestServices -and (Get-command Enable-VMIntegrationService -ErrorAction SilentlyContinue)) {
