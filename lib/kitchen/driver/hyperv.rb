@@ -23,6 +23,8 @@ require_relative "powershell"
 require "mixlib/shellout" unless defined?(Mixlib::ShellOut)
 require "fileutils" unless defined?(FileUtils)
 require "json" unless defined?(JSON)
+require "train" unless defined?(Train)
+require "train-winrm" unless defined?(TrainPlugins::WinRM)
 
 module Kitchen
 
@@ -34,8 +36,9 @@ module Kitchen
       kitchen_driver_api_version 2
       plugin_version Kitchen::Driver::HYPERV_VERSION
 
-      default_config :parent_vhd_folder
-      default_config :parent_vhd_name
+      required_config :parent_vhd_folder
+      required_config :parent_vhd_name
+
       default_config :memory_startup_bytes, 536_870_912
       default_config :dynamic_memory_min_bytes, 536_870_912
       default_config :dynamic_memory_max_bytes, 2_147_483_648
@@ -59,6 +62,13 @@ module Kitchen
       default_config :disk_type do |driver|
         File.extname(driver[:parent_vhd_name])
       end
+
+      default_config :hyperv_server, nil
+      default_config :hyperv_username, nil
+      default_config :hyperv_password, nil
+      default_config :hyperv_ssl, false
+      default_config :hyperv_insecure, true
+      default_config :remote_vm_path, 'C:\Users\Public\Documents\Hyper-V'
 
       include Kitchen::Driver::PowerShellScripts
 
@@ -94,8 +104,8 @@ module Kitchen
       private
 
       def validate_vm_settings
-        raise "Missing parent_vhd_folder" unless vhd_folder?
-        raise "Missing parent_vhd_name" unless vhd?
+        raise "Missing parent_vhd_folder" unless vhd_folder? || remote_hyperv
+        raise "Missing parent_vhd_name" unless vhd? || remote_hyperv
 
         if config[:dynamic_memory]
           startup_bytes = config[:memory_startup_bytes]
@@ -245,6 +255,8 @@ module Kitchen
       end
 
       def remove_differencing_disk
+        return unless differencing_disk_exists
+
         info("Removing the differencing disk for #{instance.name}.")
         FileUtils.rm(differencing_disk_path)
         info("Removed the differencing disk for #{instance.name}.")
@@ -270,12 +282,18 @@ module Kitchen
         @kitchen_vm_path ||= File.join(config[:kitchen_root], ".kitchen/#{instance.name}")
       end
 
+      def remote_kitchen_vm_path
+        config[:remote_vm_path]
+      end
+
       def boot_iso_path
         @boot_iso_path ||= config[:boot_iso_path]
       end
 
       def differencing_disk_path
-        @differencing_disk_path ||= File.join(kitchen_vm_path, "diff" + "#{config[:disk_type]}")
+        kitchen_vm_base = remote_hyperv ? remote_kitchen_vm_path : kitchen_vm_path
+
+        @differencing_disk_path ||= File.join(kitchen_vm_base, "diff" + "#{config[:disk_type]}")
       end
 
       def additional_disk_path(disk_name, disk_type)
@@ -292,6 +310,44 @@ module Kitchen
 
       def vhd?
         config[:parent_vhd_name] && File.exist?(parent_vhd_path)
+      end
+
+      def remote_hyperv
+        !!config[:hyperv_server]
+      end
+
+      def connection
+        return @connection if @connection
+
+        backend = remote_hyperv ? "winrm" : "local"
+
+        train = Train.create(backend, {
+                              host:        config[:hyperv_server],
+                              user:        config[:hyperv_username],
+                              password:    config[:hyperv_password],
+                              ssl:         config[:hyperv_ssl],
+                              self_signed: config[:hyperv_insecure],
+                            })
+        @connection = train.connection
+
+        # Copy support PS1
+        @connection.upload(local_script_path, remote_script_path)
+
+        @connection
+      end
+
+      def base_script_path
+        return remote_script_path if remote_hyperv
+
+        local_script_path
+      end
+
+      def local_script_path
+        File.join(File.dirname(__FILE__), "/../../../support/hyperv.ps1")
+      end
+
+      def remote_script_path
+        File.join(config[:kitchen_root], "kitchen-hyperv", "hyperv.ps1")
       end
     end
   end

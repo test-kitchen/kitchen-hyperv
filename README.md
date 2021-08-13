@@ -91,7 +91,7 @@ driver:
     * type
       * The type of virtual disk to create, .VHD or .VHDX.  Defaults to the file extension of the parent virtual hard drive.
   * Example:
-  
+
 ```yaml
 driver:
   name: hyperv
@@ -110,7 +110,7 @@ driver:
 * copy_vm_files
   * An array of hashes (`source` and `dest`) of files or directories to copy over to the system under test. Requires enable_guest_services to be true.
   * example:
-  
+
 ```yaml
 driver:
   name: hyperv
@@ -120,8 +120,8 @@ driver:
 ```
 
 * static_mac_address
-  * String value specifying a static MAC Address to be set at virtual machine creation time.  
-  * Hyper-V will automatically assign a valid dynamic address if your input doesn't give a valid MAC Address.  
+  * String value specifying a static MAC Address to be set at virtual machine creation time.
+  * Hyper-V will automatically assign a valid dynamic address if your input doesn't give a valid MAC Address.
   * example: `static_mac_address: '00155d123456'`
 
 ## Image Configuration
@@ -133,6 +133,22 @@ driver:
  Ubuntu and other Linux virtual machines may require installation of cloud tools to allow Hyper-V to determine the virtual machine's IP.
 
 * Resolved by installing linux cloud tools. See <https://stackoverflow.com/a/33059342>
+
+## Using Remote Hyper-V Servers
+
+You can use a remote Hyper-V installation with this driver. For this you need to set:
+
+- `hyperv_server` as the IP or FQDN of the server
+- `hyperv_username`
+- `hyperv_password`
+
+All PowerShell commands to create and manage the VM will then be forwarded via WinRM by the Train framework. The accompanying `hyperv.ps1` helper script will be uploaded on the first connection.
+
+### Optional Parameters
+
+- `hyperv_ssl` (default: `false`) controls if the connection should be encrypted
+- `hyperv_insecure` (default: `true`) sets if self-signed certificates should be accepted
+- `remote_vm_path` (default: `C:\Users\Public\Documents\Hyper-V`) to specify where VMs should be stored
 
 ## Contributing
 
