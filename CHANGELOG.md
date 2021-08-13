@@ -1,5 +1,13 @@
 # Change Log
 
+## [v0.7.0](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.7.0) (2021-08-13)
+[Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.6.0...v0.7.0)
+
+- Add support for remote Hyper-V servers
+- Improve error handling when creating vm fails. Thanks @maxgronlund
+- Fix VHD configuration to be required, not throw an error later
+- Fix whitespaces, encoding headers, rubocop config
+
 ## [v0.6.0](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.6.0) (2021-07-02)
 [Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.5.5...v0.6.0)
 
