@@ -171,6 +171,7 @@ module Kitchen
         info("Creating virtual machine for #{instance.name}.")
         new_vm_object = run_ps new_vm_ps
         raise "Unable to create virtual machine for #{instance.name}." if new_vm_object.nil?
+
         @state[:id] = new_vm_object["Id"]
         info("Created virtual machine for #{instance.name}.")
       end
