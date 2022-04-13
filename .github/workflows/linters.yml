@@ -1,0 +1,33 @@
+---
+name: linters
+
+'on':
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  yamllint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@master
+      - name: Lint YAML
+        uses: koozz/yamllint-action@main
+  chefstyle:
+    env:
+      BUNDLE_WITHOUT: integration
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: ['2.7']
+    name: Chefstyle on Ruby ${{ matrix.ruby }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - uses: r7kamura/rubocop-problem-matchers-action@v1
+      - run: bundle exec chefstyle
