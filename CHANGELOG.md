@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.7.1](13-04-2022)
+
+- Update minitest requirement from ~> 5.3, < 5.15 to ~> 5.3, < 5.16 by @dependabot in <https://github.com/test-kitchen/kitchen-hyperv/pull/104>
+- Switch CI from Azure Pipelines to GitHub Actions by @tas50 in <https://github.com/test-kitchen/kitchen-hyperv/pull/94>
+- run specs on ruby 3.1 by @kasif-adnan in <https://github.com/test-kitchen/kitchen-hyperv/pull/105>
+- add linters and publish gem action by @kasif-adnan in <https://github.com/test-kitchen/kitchen-hyperv/pull/106>
+
 ## [v0.7.0](https://github.com/test-kitchen/kitchen-hyperv/tree/v0.7.0) (2021-08-13)
 [Full Changelog](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.6.0...v0.7.0)
 
