@@ -1,7 +1,7 @@
 ---
-name: 'Test'
+name: "Lint Unit"
 
-'on':
+"on":
   pull_request:
 
 jobs:
