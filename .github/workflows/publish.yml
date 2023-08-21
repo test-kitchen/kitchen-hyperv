@@ -1,17 +1,28 @@
 ---
 name: Publish
 
-'on':
+"on":
   release:
     types: [published]
 
 jobs:
-  build:
+  publish-to-github:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build and publish gem
-        uses: jstastny/publish-gem-to-github@master
+
+      - name: Build and publish to GitHub Package
+        uses: actionshub/publish-gem-to-github@v1.0.5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           owner: ${{ secrets.OWNER }}
+
+  publish-to-rubygems:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build and publish to RubyGems
+        uses: actionshub/publish-gem-to-rubygems@v1.0.0
+        with:
+          api_key: ${{ secrets.RUBY_GEMS_API_KEY }}
