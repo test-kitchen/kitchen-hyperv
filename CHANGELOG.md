@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.8.0](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.7.1...v0.8.0) (2023-08-21)
+
+
+### Features
+
+* Add publish to RubyGems into the workflow ([#114](https://github.com/test-kitchen/kitchen-hyperv/issues/114)) ([79464c4](https://github.com/test-kitchen/kitchen-hyperv/commit/79464c4cda6c3ba0ca034db0daae1ec481d8dbf8))
+
 ## [v0.7.1](13-04-2022)
 
 - Update minitest requirement from ~> 5.3, < 5.15 to ~> 5.3, < 5.16 by @dependabot in <https://github.com/test-kitchen/kitchen-hyperv/pull/104>
