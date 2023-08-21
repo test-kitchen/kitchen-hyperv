@@ -14,3 +14,4 @@ jobs:
           release-type: ruby
           package-name: kitchen-hyperv
           version-file: lib/kitchen/driver/hyperv_version.rb
+          token: ${{ secrets.PUBLISH_WORKFLOW_TOKEN }}
