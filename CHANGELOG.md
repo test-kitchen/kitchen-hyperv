@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.9.1](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.9.0...v0.9.1) (2023-08-23)
+
+
+### Bug Fixes
+
+* Update Checkout workflows to v3 ([#118](https://github.com/test-kitchen/kitchen-hyperv/issues/118)) ([da31879](https://github.com/test-kitchen/kitchen-hyperv/commit/da31879930a4d91be4fae4cca1b8d967c5126456))
+
 ## [0.9.0](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.8.0...v0.9.0) (2023-08-22)
 
 
