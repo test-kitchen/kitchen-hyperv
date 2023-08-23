@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.9.0](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.8.0...v0.9.0) (2023-08-22)
+
+
+### Features
+
+* Add publish to RubyGems into the workflow ([#114](https://github.com/test-kitchen/kitchen-hyperv/issues/114)) ([79464c4](https://github.com/test-kitchen/kitchen-hyperv/commit/79464c4cda6c3ba0ca034db0daae1ec481d8dbf8))
+* Update the PAT that triggers the publish workflow ([#116](https://github.com/test-kitchen/kitchen-hyperv/issues/116)) ([3674502](https://github.com/test-kitchen/kitchen-hyperv/commit/36745026e92431263c90051ec002f71e75399e5b))
+
 ## [v0.7.1](13-04-2022)
 
 * Update minitest requirement from ~> 5.3, < 5.15 to ~> 5.3, < 5.16 by @dependabot in <https://github.com/test-kitchen/kitchen-hyperv/pull/104>
