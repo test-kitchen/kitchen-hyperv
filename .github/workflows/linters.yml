@@ -7,30 +7,3 @@ name: "Lint Unit"
 jobs:
   lint-unit:
     uses: test-kitchen/.github/.github/workflows/lint-unit.yml@main
-
-  pre-release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: google-github-actions/release-please-action@v3
-        id: release
-        with:
-          release-type: ruby
-          package-name: kitchen-hyperv
-          version-file: lib/kitchen/driver/hyperv_version.rb
-          token: ${{ secrets.PUBLISH_WORKFLOW_TOKEN }}
-          signoff: "Dan Webb <dan.webb@damacus.io>"
-          changelog-notes-type: github
-          prerelease: true
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build Gem
-        run: find . -name '*.gemspec' -maxdepth 1 -exec gem build {} \;
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: kitchen-hyperv
-          path: |
-            *.gem
