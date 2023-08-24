@@ -28,6 +28,7 @@ jobs:
 
   publish-to-github:
     runs-on: ubuntu-latest
+    needs: release-please
     steps:
       - uses: actions/checkout@v3
       - name: Build and publish to GitHub Package
@@ -39,6 +40,7 @@ jobs:
 
   publish-to-rubygems:
     runs-on: ubuntu-latest
+    needs: release-please
     steps:
       - uses: actions/checkout@v3
       - name: Build and publish to RubyGems
