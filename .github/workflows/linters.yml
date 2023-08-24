@@ -21,3 +21,13 @@ jobs:
           signoff: "Dan Webb <dan.webb@damacus.io>"
           changelog-notes-type: github
           prerelease: true
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          ls -la
+          find . -name '*.gemspec' -maxdepth 1 -exec gem build {} \;
+          ls -la;
+          ls -la *.gem;
