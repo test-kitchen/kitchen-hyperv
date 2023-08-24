@@ -1,13 +1,14 @@
 ---
-'on':
+"on":
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
 
 name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
     steps:
       - uses: google-github-actions/release-please-action@v3
         with:
@@ -15,3 +16,19 @@ jobs:
           package-name: kitchen-hyperv
           version-file: lib/kitchen/driver/hyperv_version.rb
           token: ${{ secrets.PUBLISH_WORKFLOW_TOKEN }}
+          signoff: "Dan Webb <dan.webb@damacus.io>"
+          prerelease: true
+          changelog-notes-type: github
+
+  release-please-main:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: ruby
+          package-name: kitchen-hyperv
+          version-file: lib/kitchen/driver/hyperv_version.rb
+          token: ${{ secrets.PUBLISH_WORKFLOW_TOKEN }}
+          signoff: "Dan Webb <dan.webb@damacus.io>"
+          changelog-notes-type: github
