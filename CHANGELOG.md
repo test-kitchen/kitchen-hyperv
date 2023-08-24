@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.9.2 (2023-08-24)
+
+## What's Changed
+* Fix: Update publish containers by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/120
+* fix: Tidy files by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/121
+* fix: Add missing needs step by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/123
+
+
+**Full Changelog**: https://github.com/test-kitchen/kitchen-hyperv/compare/v0.9.1...v0.9.2
+
 ## [0.9.1](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.9.0...v0.9.1) (2023-08-23)
 
 
