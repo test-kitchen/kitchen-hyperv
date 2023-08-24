@@ -1,8 +1,7 @@
 ---
-'on':
+"on":
   push:
-    branches:
-      - main
+    branches: [main]
 
 name: release-please
 jobs:
@@ -10,8 +9,40 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: google-github-actions/release-please-action@v3
+        id: release
         with:
           release-type: ruby
           package-name: kitchen-hyperv
           version-file: lib/kitchen/driver/hyperv_version.rb
           token: ${{ secrets.PUBLISH_WORKFLOW_TOKEN }}
+          signoff: "Dan Webb <dan.webb@damacus.io>"
+          changelog-notes-type: github
+
+      - name: Upload Release Artifact
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          find . -name '*.gemspec' -maxdepth 1 -exec gem build {} \;
+          gh release upload ${{ steps.release.outputs.tag_name }} *.gem
+
+  publish-to-github:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build and publish to GitHub Package
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actionshub/publish-gem-to-github@v1.0.6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          owner: ${{ secrets.OWNER }}
+
+  publish-to-rubygems:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build and publish to RubyGems
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actionshub/publish-gem-to-rubygems@v1.0.1
+        with:
+          api_key: ${{ secrets.RUBY_GEMS_API_KEY }}
