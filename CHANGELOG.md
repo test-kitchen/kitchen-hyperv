@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.9.5 (2023-08-24)
+
+## What's Changed
+* fix: Will this fix the publish step finally? by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/128
+
+
+**Full Changelog**: https://github.com/test-kitchen/kitchen-hyperv/compare/v0.9.4...v0.9.5
+
 ## 0.9.4 (2023-08-24)
 
 ## What's Changed
