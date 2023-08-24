@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.9.3 (2023-08-24)
+
+## What's Changed
+* fix: Add missing leading slash to upload by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/124
+
+
+**Full Changelog**: https://github.com/test-kitchen/kitchen-hyperv/compare/v0.9.2...v0.9.3
+
 ## 0.9.2 (2023-08-24)
 
 ## What's Changed
