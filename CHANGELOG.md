@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.9.4 (2023-08-24)
+
+## What's Changed
+* fix: Cleanup CI files by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/126
+
+
+**Full Changelog**: https://github.com/test-kitchen/kitchen-hyperv/compare/v0.9.3...v0.9.4
+
 ## 0.9.3 (2023-08-24)
 
 ## What's Changed
