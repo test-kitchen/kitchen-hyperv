@@ -3,7 +3,7 @@
   push:
     branches: [main]
 
-name: release-please
+name: Release
 jobs:
   release-please:
     runs-on: ubuntu-latest
@@ -27,6 +27,6 @@ jobs:
 
       - name: Build and publish to RubyGems
         if: ${{ steps.release.outputs.release_created }}
-        uses: actionshub/publish-gem-to-rubygems@v1.0.1
+        uses: actionshub/publish-gem-to-rubygems@v1.0.3
         with:
-          api_key: ${{ secrets.RUBY_GEMS_API_KEY }}
+          api_key: ${{ secrets.RUBYGEMS_API_KEY }}
