@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.9.6 (2023-11-15)
+
+## What's Changed
+* Fix publishing step by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/130
+* Add renovate config by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/131
+* Revert "Add renovate config" by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/132
+* fix: Add renovate config by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/135
+
+
+**Full Changelog**: https://github.com/test-kitchen/kitchen-hyperv/compare/v0.9.5...v0.9.6
+
 ## 0.9.5 (2023-08-24)
 
 ## What's Changed
