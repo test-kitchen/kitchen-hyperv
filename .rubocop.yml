@@ -4,3 +4,14 @@ Layout/LineLength:
 
 Style/Documentation:
   Enabled: false
+
+require:
+  - chefstyle
+
+AllCops:
+  TargetRubyVersion: 3.1
+  Include:
+    - "**/*.rb"
+  Exclude:
+    - "vendor/**/*"
+    - "spec/**/*"
