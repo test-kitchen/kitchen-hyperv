@@ -1,9 +1,0 @@
----
-name: "Lint Unit"
-
-"on":
-  pull_request:
-
-jobs:
-  lint-unit:
-    uses: test-kitchen/.github/.github/workflows/lint-unit.yml@main
