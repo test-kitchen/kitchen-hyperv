@@ -1,9 +1,10 @@
 ---
+name: release-please
+
 "on":
   push:
     branches: [main]
 
-name: Release
 jobs:
   release-please:
     runs-on: ubuntu-latest
@@ -14,19 +15,21 @@ jobs:
           release-type: ruby
           package-name: kitchen-hyperv
           version-file: lib/kitchen/driver/hyperv_version.rb
-          token: ${{ secrets.PUBLISH_WORKFLOW_TOKEN }}
-          signoff: "Dan Webb <dan.webb@damacus.io>"
-          changelog-notes-type: github
+          token: ${{ secrets.PORTER_GITHUB_TOKEN }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.release_created }}
 
       - name: Build and publish to GitHub Package
+        uses: actionshub/publish-gem-to-github@main
         if: ${{ steps.release.outputs.release_created }}
-        uses: actionshub/publish-gem-to-github@v1.0.12
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           owner: ${{ secrets.OWNER }}
 
       - name: Build and publish to RubyGems
+        uses: actionshub/publish-gem-to-rubygems@main
         if: ${{ steps.release.outputs.release_created }}
-        uses: actionshub/publish-gem-to-rubygems@v1.0.3
         with:
-          api_key: ${{ secrets.RUBYGEMS_API_KEY }}
+          token: ${{ secrets.RUBYGEMS_API_KEY }}
