@@ -27,6 +27,6 @@ jobs:
 
       - name: Build and publish to RubyGems
         if: ${{ steps.release.outputs.release_created }}
-        uses: actionshub/publish-gem-to-rubygems@v1.0.3
+        uses: actionshub/publish-gem-to-rubygems@v2.0.3
         with:
           api_key: ${{ secrets.RUBYGEMS_API_KEY }}
