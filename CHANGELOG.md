@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.10.0](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.9.6...v0.10.0) (2023-11-27)
+
+
+### Features
+
+* Use New release workflow ([#139](https://github.com/test-kitchen/kitchen-hyperv/issues/139)) ([dc35534](https://github.com/test-kitchen/kitchen-hyperv/commit/dc35534db56ac4a023bb99f5af2b7e5990018038))
+
 ## 0.9.6 (2023-11-15)
 
 ## What's Changed
