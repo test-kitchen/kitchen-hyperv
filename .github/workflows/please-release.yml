@@ -20,7 +20,7 @@ jobs:
 
       - name: Build and publish to GitHub Package
         if: ${{ steps.release.outputs.release_created }}
-        uses: actionshub/publish-gem-to-github@v1.0.6
+        uses: actionshub/publish-gem-to-github@v1.0.12
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           owner: ${{ secrets.OWNER }}
