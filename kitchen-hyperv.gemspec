@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.files         = %w{LICENSE kitchen-hyperv.gemspec Gemfile Rakefile support/hyperv.ps1} + Dir.glob("lib/**/*")
   spec.require_paths = ["lib"]
 
-  spec.required_ruby_version = ">= 2.6"
+  spec.required_ruby_version = ">= 3.1"
 
   spec.add_dependency "test-kitchen", ">= 1.4", "< 4"
   spec.add_dependency "train", "~> 3.5"
