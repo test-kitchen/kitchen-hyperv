@@ -10,6 +10,7 @@
 ## 0.9.6 (2023-11-15)
 
 ## What's Changed
+
 * Fix publishing step by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/130
 * Add renovate config by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/131
 * Revert "Add renovate config" by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/132
@@ -21,6 +22,7 @@
 ## 0.9.5 (2023-08-24)
 
 ## What's Changed
+
 * fix: Will this fix the publish step finally? by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/128
 
 
@@ -29,6 +31,7 @@
 ## 0.9.4 (2023-08-24)
 
 ## What's Changed
+
 * fix: Cleanup CI files by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/126
 
 
@@ -37,6 +40,7 @@
 ## 0.9.3 (2023-08-24)
 
 ## What's Changed
+
 * fix: Add missing leading slash to upload by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/124
 
 
@@ -45,6 +49,7 @@
 ## 0.9.2 (2023-08-24)
 
 ## What's Changed
+
 * Fix: Update publish containers by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/120
 * fix: Tidy files by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/121
 * fix: Add missing needs step by @damacus in https://github.com/test-kitchen/kitchen-hyperv/pull/123
