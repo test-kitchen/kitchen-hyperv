@@ -6,4 +6,24 @@ name: "Lint Unit"
 
 jobs:
   lint-unit:
-    uses: test-kitchen/.github/.github/workflows/lint-unit.yml@v0.1.2
+    uses: test-kitchen/.github/.github/workflows/lint-unit.yml@main
+
+  integration:
+    runs-on: windows-latest
+    needs: lint-unit
+    name: Kitchen Verify
+    strategy:
+      matrix:
+        ruby: ["3.3"]
+        os: ["almalinux-9"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Kitchen Verify
+        run: |
+          bundle exec kitchen verify default-${{ matrix.os}}
+        env:
+          CHEF_LICENSE: "accept-no-persist"
