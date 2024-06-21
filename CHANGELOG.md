@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.10.1](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.10.0...v0.10.1) (2024-06-21)
+
+
+### Bug Fixes
+
+* add release please configs ([#146](https://github.com/test-kitchen/kitchen-hyperv/issues/146)) ([c2f4d11](https://github.com/test-kitchen/kitchen-hyperv/commit/c2f4d1148de14988166c2415ef4015afe24efc55))
+
 ## [0.10.0](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.9.6...v0.10.0) (2023-11-27)
 
 
