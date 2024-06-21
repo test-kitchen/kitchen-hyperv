@@ -8,7 +8,7 @@ group :test do
   gem "kitchen-dokken"
   gem "kitchen-vagrant"
   gem "rake"
-  gem "minitest", "~> 5.3", "< 5.20.1"
+  gem "minitest", "~> 5.3", "< 6.0"
   gem "minitest-stub-const"
   gem "mocha", "~> 2.0"
 end
