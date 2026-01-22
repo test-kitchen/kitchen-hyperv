@@ -10,7 +10,7 @@ group :test do
   gem "rake"
   gem "minitest", "~> 5.3", "< 6.0"
   gem "minitest-stub-const"
-  gem "mocha", "~> 2.0"
+  gem "mocha", "~> 3.0"
 end
 
 group :development do
