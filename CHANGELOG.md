@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.10.2](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.10.1...v0.10.2) (2026-01-22)
+
+
+### Bug Fixes
+
+* bump tk dep to allow tk 4 ([#152](https://github.com/test-kitchen/kitchen-hyperv/issues/152)) ([b7c9f94](https://github.com/test-kitchen/kitchen-hyperv/commit/b7c9f9436903ea0afcaa95887f944559fdf580a1))
+
 ## [0.10.1](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.10.0...v0.10.1) (2024-06-21)
 
 
