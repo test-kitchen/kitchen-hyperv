@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.10.3](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.10.2...v0.10.3) (2026-02-19)
+
+
+### Bug Fixes
+
+* loosen train deps requirements ([#154](https://github.com/test-kitchen/kitchen-hyperv/issues/154)) ([63d7ae7](https://github.com/test-kitchen/kitchen-hyperv/commit/63d7ae71851748bc43d921fec83337e4f8ac90a0))
+
 ## [0.10.2](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.10.1...v0.10.2) (2026-01-22)
 
 
