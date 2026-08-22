@@ -1,14 +1,13 @@
 source "https://rubygems.org"
 
-gemspec
-
+gemspec development_group: :test
 group :test do
   gem "berkshelf"
   gem "kitchen-inspec"
   gem "kitchen-dokken"
   gem "kitchen-vagrant"
   gem "rake"
-  gem "minitest", "~> 6.0", "< 6.1"
+  gem "minitest", ">= 5.0"
   gem "minitest-stub-const"
   gem "mocha", "~> 3.0"
 end
@@ -22,7 +21,6 @@ end
 group :docs do
   gem "yard"
 end
-
 
 group :cookstyle do
   gem "cookstyle"
