@@ -228,7 +228,7 @@ module Kitchen
         existing_vm = run_ps ensure_vm_running_ps
         return false if existing_vm.nil? || existing_vm["Id"].nil?
 
-        info("Found an exising VM with an ID: #{existing_vm["Id"]}")
+        info("Found an existing VM with an ID: #{existing_vm["Id"]}")
         true
       end
 
