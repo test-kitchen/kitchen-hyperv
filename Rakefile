@@ -32,17 +32,3 @@ rescue LoadError
 end
 
 task default: %i{test quality}
-begin
-  require "github_changelog_generator/task"
-
-  GitHubChangelogGenerator::RakeTask.new :changelog do |config|
-    config.future_release = "v#{Kitchen::Driver::HYPERV_VERSION}"
-    config.issues = false
-    config.pulls = true
-    config.user = "test-kitchen"
-    config.project = "kitchen-hyperv"
-  end
-rescue LoadError
-  puts "github_changelog_generator is not available. " \
-    "gem install github_changelog_generator to generate changelogs"
-end
