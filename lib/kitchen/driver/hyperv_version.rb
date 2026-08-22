@@ -17,6 +17,13 @@
 
 module Kitchen
   module Driver
+    # Version of the kitchen-hyperv gem, reported by `kitchen diagnose` as the
+    # driver's plugin version.
+    #
+    # Kept in its own file so the gemspec can read it without loading the
+    # driver, and therefore without loading test-kitchen.
+    #
+    # @return [String] a frozen semantic version
     HYPERV_VERSION = "0.10.3".freeze
   end
 end
