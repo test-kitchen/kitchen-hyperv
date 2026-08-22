@@ -323,10 +323,10 @@ module Kitchen
         backend = remote_hyperv ? "winrm" : "local"
 
         train = Train.create(backend, {
-                              host:        config[:hyperv_server],
-                              user:        config[:hyperv_username],
-                              password:    config[:hyperv_password],
-                              ssl:         config[:hyperv_ssl],
+                              host: config[:hyperv_server],
+                              user: config[:hyperv_username],
+                              password: config[:hyperv_password],
+                              ssl: config[:hyperv_ssl],
                               self_signed: config[:hyperv_insecure],
                             })
         @connection = train.connection
