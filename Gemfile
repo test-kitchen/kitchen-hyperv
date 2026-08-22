@@ -19,10 +19,6 @@ group :development do
   gem "pry-stack_explorer"
 end
 
-group :chefstyle do
-  gem "chefstyle"
-end
-
 group :docs do
   gem "yard"
 end
