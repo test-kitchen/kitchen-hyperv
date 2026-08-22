@@ -24,6 +24,6 @@ module Kitchen
     # driver, and therefore without loading test-kitchen.
     #
     # @return [String] a frozen semantic version
-    HYPERV_VERSION = "0.10.3".freeze
+    HYPERV_VERSION = "0.11.0".freeze
   end
 end

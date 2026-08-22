@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.11.0](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.10.3...v0.11.0) (2026-08-22)
+
+
+### Features
+
+* rewrite the test suite and fix seven driver bugs ([#162](https://github.com/test-kitchen/kitchen-hyperv/issues/162)) ([6616094](https://github.com/test-kitchen/kitchen-hyperv/commit/661609413654c6bd29f2a490dfff64ddea8aa6da))
+
 ## [0.10.3](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.10.2...v0.10.3) (2026-02-19)
 
 
