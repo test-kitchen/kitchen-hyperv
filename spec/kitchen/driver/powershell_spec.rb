@@ -91,13 +91,35 @@ RSpec.describe Kitchen::Driver::PowerShellScripts do
     end
 
     it "uses Sysnative to escape WOW64 when a 32-bit Ruby runs on a 64-bit OS" do
+      # PROCESSOR_ARCHITEW6432 is only set for a 32-bit process on 64-bit
+      # Windows, and is the one signal that sees through the redirector.
       allow(ENV).to receive(:[]).with("PROCESSOR_ARCHITEW6432").and_return("AMD64")
       allow(ENV).to receive(:[]).with("PROCESSOR_ARCHITECTURE").and_return("x86")
-      allow(ps).to receive(:is_64bit?).and_return(false)
-      allow(ps).to receive(:is_32bit?).and_return(false)
+      allow(ps).to receive(:ruby_architecture_bits).and_return(32)
 
       expect(generate(:powershell_64_bit))
         .to eq('c:\windows\sysnative\windowspowershell\v1.0\powershell.exe')
+    end
+
+    it "uses the native System32 powershell on a genuinely 32-bit host" do
+      with_arch("x86")
+      allow(ps).to receive(:ruby_architecture_bits).and_return(32)
+
+      expect(generate(:powershell_64_bit))
+        .to eq('c:\windows\system32\windowspowershell\v1.0\powershell.exe')
+    end
+
+    it "uses the native System32 powershell on a 64-bit ARM host" do
+      with_arch("ARM64")
+
+      expect(generate(:powershell_64_bit))
+        .to eq('c:\\windows\\system32\\windowspowershell\\v1.0\\powershell.exe')
+    end
+
+    it "treats an ARM64 host as 64-bit" do
+      with_arch("ARM64")
+
+      expect(ps.send(:sixty_four_bit?)).to be(true)
     end
 
     context "when the host is remote" do

@@ -158,11 +158,32 @@ By default the driver drives the local Hyper-V host. Set `hyperv_server` to run 
 | `hyperv_insecure` | `true` | Skip certificate validation when `hyperv_ssl` is enabled. |
 | `remote_vm_path` | `C:\Users\Public\Documents\Hyper-V` | Path on the remote server where VM files are stored. |
 
+> **On `hyperv_insecure`.** It defaults to `true`, which means the driver does
+> **not** verify the Hyper-V server's TLS certificate when `hyperv_ssl` is on.
+> That default exists because Hyper-V hosts usually present the self-signed
+> certificate WinRM generates for itself. It also means the connection can be
+> intercepted, so credentials and everything the driver sends are only as
+> private as the network between you and the host. If your host has a
+> certificate from a CA the client trusts, set `hyperv_insecure: false`.
+> On a trusted lab network the default is normally fine; over anything shared
+> or routed, it is not.
+
 ### Debugging
 
 | Option | Default | Description |
 | --- | --- | --- |
 | `dry_run` | `false` | Echo the generated PowerShell instead of running it. Useful for debugging the driver. |
+
+The driver also implements the standard Test Kitchen diagnostics:
+
+```sh
+kitchen list --probe   # asks Hyper-V whether each instance's VM still exists
+kitchen doctor         # checks for a missing Hyper-V module or parent VHD
+kitchen diagnose --all # shows every resolved driver option
+```
+
+`kitchen list --probe` is read-only: it reports a stopped instance as stopped
+rather than starting it.
 
 ## Examples
 

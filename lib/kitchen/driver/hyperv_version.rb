@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Author:: Steven Murawski <smurawski@chef.io>
 # Copyright:: Copyright (c) 2015-2020 Chef Software, Inc.
@@ -24,6 +26,6 @@ module Kitchen
     # driver, and therefore without loading test-kitchen.
     #
     # @return [String] a frozen semantic version
-    HYPERV_VERSION = "0.11.0".freeze
+    HYPERV_VERSION = "0.11.0"
   end
 end

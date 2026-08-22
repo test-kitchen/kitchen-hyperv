@@ -381,3 +381,135 @@ Describe 'Get-VmDetail' {
         $detail.IpAddress | Should -Be '192.168.1.50'
     }
 }
+
+Describe 'Get-VmStatus' {
+    BeforeAll { . (Join-Path $PSScriptRoot 'TestHelper.ps1') }
+
+    It 'reports the name, id and power state as strings' {
+        Mock Get-VM { [pscustomobject]@{ Name = 'kitchen'; Id = 'vm-1'; State = 'Running' } }
+
+        $status = Get-VmStatus -Id 'vm-1'
+
+        $status.Name | Should -Be 'kitchen'
+        $status.Id | Should -BeOfType [string]
+        $status.State | Should -BeOfType [string]
+        $status.State | Should -Be 'Running'
+    }
+
+    It 'returns nothing when the VM no longer exists' {
+        Mock Get-VM
+
+        Get-VmStatus -Id 'gone' | Should -BeNullOrEmpty
+    }
+
+    It 'never starts the VM' {
+        Mock Get-VM { [pscustomobject]@{ Name = 'kitchen'; Id = 'vm-1'; State = 'Off' } }
+        Mock Start-VM
+
+        Get-VmStatus -Id 'vm-1'
+
+        Should -Invoke Start-VM -Exactly -Times 0
+    }
+}
+
+Describe 'Set-VMNetworkConfiguration' {
+    BeforeAll { . (Join-Path $PSScriptRoot 'TestHelper.ps1') }
+
+    # Mocks live in BeforeEach, not in a setup helper: Pester registers a mock
+    # against the scope Mock is called from, so mocks created inside a helper
+    # function vanish when it returns and every call falls through to the real
+    # command. The fixtures below are script-scoped so an It can vary one before
+    # calling, without re-declaring the whole mock set.
+    BeforeEach {
+        $script:guestConfig = [pscustomobject]@{
+            IPAddresses     = @()
+            Subnets         = @()
+            DefaultGateways = @()
+            DNSServers      = @()
+            ProtocolIFType  = 0
+            DHCPEnabled     = $true
+        }
+        $script:adapterMac = 'AABBCCDDEEFF'
+        $script:invokeResult = [pscustomobject]@{ ReturnValue = 0 }
+        $script:jobInstance = $null
+
+        Mock Get-CimInstance { [pscustomobject]@{ ElementName = 'kitchen' } } `
+            -ParameterFilter { $ClassName -eq 'Msvm_ComputerSystem' }
+        Mock Get-CimInstance { [pscustomobject]@{ Name = 'vmms' } } `
+            -ParameterFilter { $ClassName -eq 'Msvm_VirtualSystemManagementService' }
+        Mock Get-CimInstance { $script:jobInstance } `
+            -ParameterFilter { $null -ne $InputObject }
+        Mock Get-CimAssociatedInstance { [pscustomobject]@{ VirtualSystemType = 'Microsoft:Hyper-V:System:Realized' } } `
+            -ParameterFilter { $ResultClassName -eq 'Msvm_VirtualSystemSettingData' }
+        Mock Get-CimAssociatedInstance { [pscustomobject]@{ Address = $script:adapterMac } } `
+            -ParameterFilter { $ResultClassName -eq 'Msvm_SyntheticEthernetPortSettingData' }
+        Mock Get-CimAssociatedInstance { $script:guestConfig } `
+            -ParameterFilter { $ResultClassName -eq 'Msvm_GuestNetworkAdapterConfiguration' }
+        Mock Invoke-CimMethod { $script:invokeResult }
+        Mock Get-VM { [pscustomobject]@{ NetworkAdapters = @() } }
+
+        $script:adapter = [pscustomobject]@{
+            VMName = 'kitchen'; MacAddress = 'AABBCCDDEEFF'; VmId = 'vm-1'
+        }
+    }
+
+    It 'writes the addressing onto the guest adapter configuration' {
+        Set-VMNetworkConfiguration -NetworkAdapter $script:adapter -IPAddress '192.168.1.50' `
+            -Subnet '255.255.255.0' -Gateway '192.168.1.1' -DNSServers '8.8.8.8'
+
+        $script:guestConfig.IPAddresses | Should -Be @('192.168.1.50')
+        $script:guestConfig.Subnets | Should -Be @('255.255.255.0')
+        $script:guestConfig.DefaultGateways | Should -Be @('192.168.1.1')
+        $script:guestConfig.DNSServers | Should -Be @('8.8.8.8')
+    }
+
+    It 'switches the adapter off DHCP and onto IPv4' {
+        Set-VMNetworkConfiguration -NetworkAdapter $script:adapter -IPAddress '192.168.1.50'
+
+        $script:guestConfig.DHCPEnabled | Should -BeFalse
+        $script:guestConfig.ProtocolIFType | Should -Be 4096
+    }
+
+    It 'invokes SetGuestNetworkAdapterConfiguration with the computer system and configuration' {
+        Set-VMNetworkConfiguration -NetworkAdapter $script:adapter -IPAddress '192.168.1.50'
+
+        Should -Invoke Invoke-CimMethod -Exactly -Times 1 -ParameterFilter {
+            $MethodName -eq 'SetGuestNetworkAdapterConfiguration' -and
+            $Arguments.ContainsKey('ComputerSystem') -and
+            $Arguments.ContainsKey('NetworkConfiguration')
+        }
+    }
+
+    It 'fails loudly when no adapter matches the MAC address' {
+        $script:adapterMac = '001122334455'
+
+        { Set-VMNetworkConfiguration -NetworkAdapter $script:adapter -IPAddress '192.168.1.50' } |
+            Should -Throw '*No guest network adapter configuration found*'
+    }
+
+    It 'fails loudly when the method reports an error' {
+        $script:invokeResult = [pscustomobject]@{ ReturnValue = 32768 }
+
+        { Set-VMNetworkConfiguration -NetworkAdapter $script:adapter -IPAddress '192.168.1.50' } |
+            Should -Throw '*return value 32768*'
+    }
+
+    It 'completes quietly when an asynchronous job finishes' {
+        # 4096 = job started, 7 = completed.
+        $script:invokeResult = [pscustomobject]@{ ReturnValue = 4096; Job = 'job-ref' }
+        $script:jobInstance = [pscustomobject]@{ JobState = 7 }
+
+        { Set-VMNetworkConfiguration -NetworkAdapter $script:adapter -IPAddress '192.168.1.50' } |
+            Should -Not -Throw
+    }
+
+    It 'fails loudly when an asynchronous job does not complete' {
+        # 10 = Exception. This previously emitted the error and carried on,
+        # hiding a failed address assignment behind a successful create.
+        $script:invokeResult = [pscustomobject]@{ ReturnValue = 4096; Job = 'job-ref' }
+        $script:jobInstance = [pscustomobject]@{ JobState = 10; ErrorDescription = 'KVP timeout' }
+
+        { Set-VMNetworkConfiguration -NetworkAdapter $script:adapter -IPAddress '192.168.1.50' } |
+            Should -Throw '*KVP timeout*'
+    }
+}

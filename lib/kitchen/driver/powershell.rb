@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Author:: Steven Murawski <smurawski@chef.io>
 # Copyright:: Copyright (c) 2020 Chef Software, Inc.
@@ -16,8 +18,8 @@
 # limitations under the License.
 
 require "base64" unless defined?(Base64)
-require "mixlib/shellout" unless defined?(Mixlib::ShellOut)
 require "benchmark" unless defined?(Benchmark)
+require "rbconfig/sizeof" unless defined?(RbConfig::SIZEOF)
 require "fileutils" unless defined?(FileUtils)
 require "json" unless defined?(JSON)
 
@@ -41,6 +43,13 @@ module Kitchen
     #
     # @see Kitchen::Driver::Hyperv
     module PowerShellScripts
+      # Values Windows reports in PROCESSOR_ARCHITECTURE for a 64-bit OS.
+      #
+      # ARM64 matters for Windows on ARM devices, which run Hyper-V: matching
+      # only AMD64 there made both width checks false and sent the driver to
+      # the Sysnative path, which does not exist for a native 64-bit process.
+      SIXTY_FOUR_BIT_ARCHITECTURES = %w{AMD64 ARM64 IA64}.freeze
+
       # Encode a script the way `powershell.exe -encodedcommand` expects it:
       # UTF-16LE, then Base64.
       #
@@ -52,6 +61,26 @@ module Kitchen
         Base64.strict_encode64(encoded_script)
       end
 
+      # The OS architecture, seeing through WOW64.
+      #
+      # A 32-bit process on 64-bit Windows reads its own architecture from
+      # PROCESSOR_ARCHITECTURE; PROCESSOR_ARCHITEW6432 is what reveals the real
+      # one, and is only set in that case.
+      #
+      # @return [String, nil]
+      # @api private
+      def os_architecture
+        ENV["PROCESSOR_ARCHITEW6432"] || ENV["PROCESSOR_ARCHITECTURE"]
+      end
+
+      # Pointer width of the running Ruby, in bits.
+      #
+      # @return [Integer] 32 or 64
+      # @api private
+      def ruby_architecture_bits
+        RbConfig::SIZEOF.fetch("void*", 8) * 8
+      end
+
       # Whether a 64-bit PowerShell is directly reachable.
       #
       # Always true for a remote host, where the local architecture is
@@ -59,12 +88,11 @@ module Kitchen
       #
       # @return [Boolean]
       # @api private
-      def is_64bit?
+      def sixty_four_bit?
         return true if remote_hyperv
 
-        os_arch = ENV["PROCESSOR_ARCHITEW6432"] || ENV["PROCESSOR_ARCHITECTURE"]
-        ruby_arch = ["foo"].pack("p").size == 4 ? 32 : 64
-        os_arch == "AMD64" && ruby_arch == 64
+        SIXTY_FOUR_BIT_ARCHITECTURES.include?(os_architecture) &&
+          ruby_architecture_bits == 64
       end
 
       # Whether both the OS and Ruby are 32-bit, so no WOW64 redirection is in
@@ -72,10 +100,25 @@ module Kitchen
       #
       # @return [Boolean]
       # @api private
+      def thirty_two_bit?
+        !SIXTY_FOUR_BIT_ARCHITECTURES.include?(os_architecture) &&
+          ruby_architecture_bits == 32
+      end
+
+      # @deprecated Use {#sixty_four_bit?}. Kept because this module is mixed
+      #   into a published driver class.
+      # @return [Boolean]
+      # @api private
+      def is_64bit?
+        sixty_four_bit?
+      end
+
+      # @deprecated Use {#thirty_two_bit?}. Kept because this module is mixed
+      #   into a published driver class.
+      # @return [Boolean]
+      # @api private
       def is_32bit?
-        os_arch = ENV["PROCESSOR_ARCHITEW6432"] || ENV["PROCESSOR_ARCHITECTURE"]
-        ruby_arch = ["foo"].pack("p").size == 4 ? 32 : 64
-        os_arch != "AMD64" && ruby_arch == 32
+        thirty_two_bit?
       end
 
       # Path to a PowerShell that can see the Hyper-V cmdlets.
@@ -88,7 +131,7 @@ module Kitchen
       # @return [String]
       # @api private
       def powershell_64_bit
-        if is_64bit? || is_32bit?
+        if sixty_four_bit? || thirty_two_bit?
           'c:\windows\system32\windowspowershell\v1.0\powershell.exe'
         else
           'c:\windows\sysnative\windowspowershell\v1.0\powershell.exe'
@@ -254,6 +297,34 @@ module Kitchen
 
           Get-VmDetail -id "#{@state[:id]}" | ConvertTo-Json
         DETAILS
+      end
+
+      # Script that reads the VM's current power state without changing it.
+      #
+      # Unlike {#ensure_vm_running_ps}, this never starts a stopped VM, so it is
+      # safe for `kitchen list --probe`.
+      #
+      # @return [String] PowerShell source
+      # @api private
+      def vm_status_ps
+        <<-STATUS
+
+          Get-VmStatus -Id "#{@state[:id]}" | ConvertTo-Json
+        STATUS
+      end
+
+      # Script that reports whether the Hyper-V PowerShell module is installed.
+      #
+      # @return [String] PowerShell source
+      # @api private
+      def hyperv_module_ps
+        <<-MODULE
+
+          Get-Module -ListAvailable -Name Hyper-V |
+            Select-Object -First 1 |
+            ForEach-Object { [pscustomobject]@{ Name = $_.Name; Version = [string]$_.Version } } |
+            ConvertTo-Json
+        MODULE
       end
 
       # Script that forces the VM off and removes it.

@@ -151,19 +151,22 @@ Function Set-VMNetworkConfiguration {
         [String[]]$Subnet = @()
     )
 
-    $vm = Get-WmiObject -Namespace 'root\virtualization\v2' -Class 'Msvm_ComputerSystem' | Where-Object {
-        $_.ElementName -eq $NetworkAdapter.VMName
-    }
-    $VMSettings = $vm.GetRelated('Msvm_VirtualSystemSettingData') | Where-Object {
-        $_.VirtualSystemType -eq 'Microsoft:Hyper-V:System:Realized'
-    }
-    $VMNetAdapters = $VMSettings.GetRelated('Msvm_SyntheticEthernetPortSettingData')
+    $vm = Get-CimInstance -Namespace 'root\virtualization\v2' -ClassName 'Msvm_ComputerSystem' -Filter "ElementName = '$($NetworkAdapter.VMName)'"
+
+    $VMSettings = Get-CimAssociatedInstance -InputObject $vm -ResultClassName 'Msvm_VirtualSystemSettingData' |
+        Where-Object { $_.VirtualSystemType -eq 'Microsoft:Hyper-V:System:Realized' }
+
+    $VMNetAdapters = Get-CimAssociatedInstance -InputObject $VMSettings -ResultClassName 'Msvm_SyntheticEthernetPortSettingData'
 
     $NetworkSettings = @()
     foreach ($NetAdapter in $VMNetAdapters) {
         if ($NetAdapter.Address -eq $NetworkAdapter.MacAddress) {
-            $NetworkSettings = $NetworkSettings + $NetAdapter.GetRelated('Msvm_GuestNetworkAdapterConfiguration')
+            $NetworkSettings += Get-CimAssociatedInstance -InputObject $NetAdapter -ResultClassName 'Msvm_GuestNetworkAdapterConfiguration'
         }
+    }
+
+    if ($NetworkSettings.Count -eq 0) {
+        throw "No guest network adapter configuration found for MAC address $($NetworkAdapter.MacAddress) on VM $($NetworkAdapter.VMName)."
     }
 
     $NetworkSettings[0].IPAddresses = $IPAddress
@@ -174,22 +177,36 @@ Function Set-VMNetworkConfiguration {
     $NetworkSettings[0].DHCPEnabled = $false
 
 
-    $Service = Get-WmiObject -Class 'Msvm_VirtualSystemManagementService' -Namespace 'root\virtualization\v2'
-    $setIP = $Service.SetGuestNetworkAdapterConfiguration($vm, $NetworkSettings[0].GetText(1))
+    $Service = Get-CimInstance -Namespace 'root\virtualization\v2' -ClassName 'Msvm_VirtualSystemManagementService'
 
+    # NetworkConfiguration is declared string[] of embedded instances; the CIM
+    # layer serializes the CimInstance for us, replacing WMI's GetText(1).
+    $setIP = Invoke-CimMethod -InputObject $Service -MethodName 'SetGuestNetworkAdapterConfiguration' -Arguments @{
+        ComputerSystem       = $vm
+        NetworkConfiguration = @($NetworkSettings[0])
+    }
+
+    # 4096 means the method was accepted and is running as a job.
     if ($setIP.ReturnValue -eq 4096) {
-        $job = [WMI]$setIP.job
+        $job = $setIP.Job | Get-CimInstance
 
+        # 3 = Starting, 4 = Running.
         while ($job.JobState -eq 3 -or $job.JobState -eq 4) {
-            Start-Sleep 1
-            $job = [WMI]$setIP.job
+            Start-Sleep -Seconds 1
+            $job = $job | Get-CimInstance
         }
 
+        # 7 = Completed. Anything else previously emitted the error and carried
+        # on, which hid a failed address assignment behind a successful create.
         if ($job.JobState -ne 7) {
-            $job.GetError()
+            throw "Setting the guest network adapter configuration failed: $($job.ErrorDescription)"
         }
     }
-    (Get-VM -Id $NetworkAdapter.VmId).NetworkAdapter | Select-Object Name, IpAddress
+    elseif ($setIP.ReturnValue -ne 0) {
+        throw "Setting the guest network adapter configuration failed with return value $($setIP.ReturnValue)."
+    }
+
+    (Get-VM -Id $NetworkAdapter.VmId).NetworkAdapters | Select-Object Name, IPAddresses
 }
 
 function Get-VmDetail {
@@ -208,6 +225,20 @@ function Get-VmDetail {
             Name = $vm.name
             Id = $vm.ID
             IpAddress = (Get-VmIP $vm)
+        }
+    }
+}
+
+function Get-VmStatus {
+    [cmdletbinding()]
+    param($Id)
+
+    Get-VM -Id $Id -ErrorAction SilentlyContinue |
+        ForEach-Object {
+        [pscustomobject]@{
+            Name  = $_.Name
+            Id    = [string]$_.Id
+            State = [string]$_.State
         }
     }
 }
