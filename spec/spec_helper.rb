@@ -1,8 +1,4 @@
 #
-# Author:: Fletcher Nichol (<fnichol@nichol.ca>)
-#
-# Copyright (C) 2012, Fletcher Nichol
-#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,28 +11,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-gem "minitest"
-gem "minitest-stub-const"
+$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 
-if ENV["CODECLIMATE_REPO_TOKEN"]
-  require "codeclimate-test-reporter"
-  CodeClimate::TestReporter.start
-elsif ENV["COVERAGE"]
-  require "simplecov"
-  SimpleCov.profiles.define "gem" do
-    command_name "Specs"
+require "kitchen"
+require "kitchen/driver/hyperv"
 
-    add_filter ".gem/"
-    add_filter "/spec/"
-    add_filter "/lib/vendor/"
+Dir[File.expand_path("support/**/*.rb", __dir__)].sort.each { |f| require f }
 
-    add_group "Libraries", "/lib/"
+RSpec.configure do |config|
+  config.expect_with :rspec do |expectations|
+    expectations.include_chain_clauses_in_custom_matcher_descriptions = true
+    expectations.syntax = :expect
   end
-  SimpleCov.start "gem"
-end
 
-require "minitest"
-require "minitest/stub_const"
-require "minitest/autorun"
-require "mocha/minitest"
-require "tempfile" unless defined?(Tempfile)
+  config.mock_with :rspec do |mocks|
+    mocks.syntax = :expect
+    # Fail if we stub a method that does not exist on the real collaborator.
+    # This is what keeps the suite honest when test-kitchen changes its API.
+    mocks.verify_partial_doubles = true
+  end
+
+  config.shared_context_metadata_behavior = :apply_to_host_groups
+  config.disable_monkey_patching!
+  config.warnings = false
+  config.raise_errors_for_deprecations!
+
+  config.filter_run_when_matching :focus
+  config.example_status_persistence_file_path = ".rspec_status"
+
+  config.default_formatter = "doc" if config.files_to_run.one?
+
+  config.order = :random
+  Kernel.srand config.seed
+
+  config.include DriverHelpers
+end
