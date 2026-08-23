@@ -479,6 +479,111 @@ RSpec.describe Kitchen::Driver::Hyperv do
     end
   end
 
+  describe "#status" do
+    it "reports not_created when the instance state has no VM id" do
+      expect(driver.status({})).to include(live: false, state: "not_created")
+    end
+
+    it "reports the VM as running when Hyper-V knows it" do
+      connection.stub_script(/Get-VmStatus/, json: {
+        "Name" => "coolbeans", "Id" => "vm-0001", "State" => "Running"
+      })
+
+      expect(driver.status(id: "vm-0001"))
+        .to include(live: true, state: "running", resource_id: "vm-0001")
+    end
+
+    it "reports the VM as stopped without starting it" do
+      connection.stub_script(/Get-VmStatus/, json: {
+        "Name" => "coolbeans", "Id" => "vm-0001", "State" => "Off"
+      })
+
+      status = driver.status(id: "vm-0001")
+
+      expect(status).to include(live: false, state: "stopped")
+      expect(connection.ran?(/Assert-VmRunning/)).to be(false)
+    end
+
+    it "reports not_created when the id refers to a VM that is gone" do
+      connection.stub_script(/Get-VmStatus/, stdout: "")
+
+      expect(driver.status(id: "vm-0001")).to include(live: false, state: "not_created")
+    end
+
+    it "reports unknown rather than raising when the host cannot be reached" do
+      connection.stub_script(/Get-VmStatus/, stdout: "", stderr: "WinRM refused", exit_status: 1)
+
+      status = driver.status(id: "vm-0001")
+
+      expect(status).to include(live: nil, state: "unknown")
+      expect(status[:message]).to match(/WinRM refused/)
+    end
+
+    it "always timestamps the check" do
+      expect(driver.status({})[:checked_at]).to match(/\A\d{4}-\d{2}-\d{2}T/)
+    end
+  end
+
+  describe "#doctor" do
+    it "reports no problems when the host answers and the parent VHD is present" do
+      connection.stub_script(/Get-Module/, json: { "Name" => "Hyper-V" })
+
+      expect(driver.doctor(state)).to be(false)
+    end
+
+    it "reports a problem when the Hyper-V module is missing from the host" do
+      connection.stub_script(/Get-Module/, stdout: "")
+
+      expect(driver.doctor(state)).to be(true)
+    end
+
+    it "reports a problem when the host cannot be reached" do
+      connection.stub_script(/Get-Module/, stdout: "", stderr: "connection refused", exit_status: 1)
+
+      expect(driver.doctor(state)).to be(true)
+    end
+
+    it "reports a problem when the parent VHD is missing" do
+      connection.stub_script(/Get-Module/, json: { "Name" => "Hyper-V" })
+      FileUtils.rm(File.join(vhd_folder, parent_vhd_name))
+
+      expect(driver.doctor(state)).to be(true)
+    end
+  end
+
+  describe "pre_create_command" do
+    let(:driver_config) { { pre_create_command: "echo warming up" } }
+
+    it "runs before any PowerShell reaches the host" do
+      scripts_when_run = nil
+      allow(driver).to receive(:run_command) { scripts_when_run = connection.scripts.size }
+
+      driver.create(state)
+
+      expect(scripts_when_run).to eq(0)
+    end
+
+    it "runs the configured command" do
+      allow(driver).to receive(:run_command)
+
+      driver.create(state)
+
+      expect(driver).to have_received(:run_command).with("echo warming up")
+    end
+  end
+
+  describe "#diagnose" do
+    it "does not raise when parent_vhd_name is unset" do
+      bare = described_class.new(kitchen_root: kitchen_root)
+
+      expect { bare.diagnose }.not_to raise_error
+    end
+
+    it "exposes every documented config key, including copy_vm_files and dry_run" do
+      expect(driver.diagnose.keys).to include(:copy_vm_files, :dry_run)
+    end
+  end
+
   describe "#differencing_disk_exists" do
     it "is false when the disk is absent" do
       expect(driver.send(:differencing_disk_exists)).to be(false)

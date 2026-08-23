@@ -98,6 +98,20 @@ function Get-VMSwitch {
     param($Name)
 }
 
+# CimCmdlets ships only with Windows PowerShell, so these must be shimmed for
+# the suite to run anywhere.
+function Get-CimInstance {
+    param([Parameter(ValueFromPipeline)]$InputObject, $Namespace, $ClassName, $Filter)
+}
+
+function Get-CimAssociatedInstance {
+    param([Parameter(ValueFromPipeline)]$InputObject, $ResultClassName)
+}
+
+function Invoke-CimMethod {
+    param([Parameter(ValueFromPipeline)]$InputObject, $MethodName, $Arguments)
+}
+
 function Add-VMDvdDrive {
     param([Parameter(ValueFromPipeline, Position = 0)]$VMName)
 }

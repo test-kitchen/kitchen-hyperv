@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Author:: Steven Murawski <smurawski@chef.io>
 # Copyright:: Copyright (c) 2020 Chef Software, Inc.
@@ -20,11 +22,11 @@ require "kitchen"
 require "kitchen/driver"
 require_relative "hyperv_version"
 require_relative "powershell"
-require "mixlib/shellout" unless defined?(Mixlib::ShellOut)
 require "fileutils" unless defined?(FileUtils)
 require "json" unless defined?(JSON)
 require "train" unless defined?(Train)
 require "train-winrm" unless defined?(TrainPlugins::WinRM)
+require "time" unless defined?(Time.zone_offset)
 
 module Kitchen
 
@@ -77,8 +79,11 @@ module Kitchen
       default_config :disable_secureboot, false
       default_config :static_mac_address
       default_config :disk_type do |driver|
-        File.extname(driver[:parent_vhd_name])
+        File.extname(driver[:parent_vhd_name].to_s)
       end
+
+      default_config :copy_vm_files
+      default_config :dry_run, false
 
       default_config :hyperv_server, nil
       default_config :hyperv_username, nil
@@ -102,6 +107,9 @@ module Kitchen
       # @raise [RuntimeError] if validation fails or Hyper-V cannot create the VM
       def create(state)
         @state = state
+        # Kitchen::Driver::Base#create runs config[:pre_create_command].
+        # Without this the option is silently ignored.
+        super
         validate_vm_settings
         create_new_differencing_disk
         create_additional_disks
@@ -142,7 +150,108 @@ module Kitchen
         state.delete(:id)
       end
 
+      # Report whether Hyper-V still has this instance's virtual machine.
+      #
+      # Backs `kitchen list --probe`. Deliberately read-only: unlike the check
+      # {#create} makes, this never starts a stopped VM.
+      #
+      # @param state [Hash] the instance state hash
+      # @return [Hash] normalized status data for Test Kitchen
+      def status(state)
+        @state = state
+        if state[:id].nil?
+          return status_report(
+            live: false,
+            state: "not_created",
+            message: "No virtual machine id recorded for this instance."
+          )
+        end
+
+        vm = run_ps vm_status_ps
+        if vm.nil? || vm["Id"].nil?
+          status_report(live: false, state: "not_created", resource_id: state[:id],
+            message: "Hyper-V has no virtual machine with id #{state[:id]}.")
+        else
+          running = vm["State"].to_s.casecmp?("running")
+          status_report(live: running, state: running ? "running" : "stopped",
+            resource_id: vm["Id"],
+            message: "Hyper-V reports the virtual machine as #{vm["State"]}.")
+        end
+      rescue => e
+        status_report(live: nil, state: "unknown", resource_id: state[:id], message: e.message)
+      end
+
+      # Check for the common reasons this driver cannot build an instance.
+      #
+      # Backs `kitchen doctor`. Reports every problem it finds rather than
+      # stopping at the first, since they are usually related.
+      #
+      # @param state [Hash] the instance state hash
+      # @return [Boolean] true if at least one problem was found
+      def doctor(state)
+        @state = state
+        problems = hyperv_problems + parent_vhd_problems
+        problems.each { |problem| warn(problem) }
+        !problems.empty?
+      end
+
       private
+
+      # Build the status hash Test Kitchen normalizes.
+      #
+      # @return [Hash]
+      # @api private
+      def status_report(live:, state:, message:, resource_id: nil)
+        {
+          live: live,
+          state: state,
+          source: "driver",
+          resource_id: resource_id,
+          message: message,
+          checked_at: Time.now.utc.iso8601,
+        }
+      end
+
+      # Problems reaching the Hyper-V host itself.
+      #
+      # @return [Array<String>]
+      # @api private
+      def hyperv_problems
+        return [] unless run_ps(hyperv_module_ps).nil?
+
+        ["The Hyper-V PowerShell module is not installed on #{hyperv_host_description}."]
+      rescue => e
+        ["Could not run PowerShell on #{hyperv_host_description}: #{e.message}"]
+      end
+
+      # Problems with the parent VHD the instance is cloned from.
+      #
+      # Only checked locally: the paths refer to the remote host's filesystem
+      # when hyperv_server is set, so this machine cannot see them.
+      #
+      # @return [Array<String>]
+      # @api private
+      def parent_vhd_problems
+        return [] if remote_hyperv
+
+        problems = []
+        unless vhd_folder?
+          problems << "parent_vhd_folder #{config[:parent_vhd_folder].inspect} does not exist."
+        end
+        unless vhd?
+          problems << "parent_vhd_name #{config[:parent_vhd_name].inspect} was not found in " \
+                      "#{config[:parent_vhd_folder].inspect}."
+        end
+        problems
+      end
+
+      # How to refer to the Hyper-V host in a message.
+      #
+      # @return [String]
+      # @api private
+      def hyperv_host_description
+        remote_hyperv ? config[:hyperv_server] : "this machine"
+      end
 
       # Check the configuration before anything is created.
       #
