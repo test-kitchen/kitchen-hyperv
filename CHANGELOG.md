@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.12.0](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.11.0...v0.12.0) (2026-08-23)
+
+
+### Features
+
+* implement the Test Kitchen 4 driver APIs and modernize the driver ([#164](https://github.com/test-kitchen/kitchen-hyperv/issues/164)) ([5b773f6](https://github.com/test-kitchen/kitchen-hyperv/commit/5b773f63fdd23420ffd7a6bdda5831b82e638168))
+
 ## Unreleased
 
 * Implement the Test Kitchen 4 driver APIs and modernize the driver ([#164](https://github.com/test-kitchen/kitchen-hyperv/pull/164)) ([5b773f6](https://github.com/test-kitchen/kitchen-hyperv/commit/5b773f6))
