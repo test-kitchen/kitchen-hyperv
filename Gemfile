@@ -19,12 +19,6 @@ group :integration do
   gem "kitchen-vagrant"
 end
 
-group :development do
-  gem "pry"
-  gem "pry-byebug"
-  gem "pry-stack_explorer"
-end
-
 group :docs do
   gem "yard"
 end
