@@ -1,9 +1,71 @@
 ---
 name: "Lint, Unit & Integration Tests"
 
+# There is deliberately no `kitchen test` job here. Driving this plugin end to
+# end needs a host with the Hyper-V role enabled, and Hyper-V needs nested
+# virtualization, which GitHub-hosted runners do not offer. The two suites
+# below are what can be verified without a hypervisor: the Ruby unit tests,
+# which cover every PowerShell string the driver builds, and the Pester tests,
+# which cover the functions in support/hyperv.ps1 against a stub Hyper-V
+# module. Changes that touch VM creation still need a manual run against a real
+# Hyper-V host -- see "Manual testing against Hyper-V" in CONTRIBUTING.md.
+
 "on":
   pull_request:
 
 jobs:
   lint-unit:
     uses: test-kitchen/.github/.github/workflows/lint-unit.yml@main
+
+  # The shared workflow above runs the unit tests on Ubuntu only. This driver
+  # only ever runs on Windows, where File.join, Dir.exist? and the WOW64
+  # architecture detection in powershell.rb all behave differently, so the same
+  # suite runs there too.
+  windows-unit:
+    name: Unit Test with Ruby ${{ matrix.ruby }} on Windows
+    runs-on: windows-latest
+    needs: lint-unit
+    env:
+      BUNDLE_WITHOUT: "integration:development"
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["3.1", "3.4"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Rake Test
+        run: bundle exec rake test
+
+  # Pester tests for support/hyperv.ps1. These need no bundle: run_tests.ps1
+  # loads the script with the stub Hyper-V module in spec/powershell.
+  pester:
+    name: PowerShell Test with Pester
+    runs-on: windows-latest
+    needs: lint-unit
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+      - name: Install Pester
+        shell: pwsh
+        run: |
+          $installed = Get-Module -ListAvailable -Name Pester |
+            Where-Object { $_.Version -ge [version]'5.0.0' }
+          if (-not $installed) {
+            Install-Module -Name Pester -MinimumVersion 5.0 -Force -SkipPublisherCheck -Scope CurrentUser
+          }
+      - name: Run Pester
+        shell: pwsh
+        run: ./spec/powershell/run_tests.ps1 -ResultsPath pester-results.xml
+      - name: Upload Pester results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pester-results
+          path: pester-results.xml
+          if-no-files-found: ignore
