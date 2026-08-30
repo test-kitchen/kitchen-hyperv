@@ -152,6 +152,13 @@ RSpec.describe Kitchen::Driver::PowerShellScripts do
         .to raise_error(/Hyper-V is not installed/)
     end
 
+    it "reports what the host actually said when the output is not JSON" do
+      connection.stub_script(/Get-Thing/, stdout: "WARNING: the RPC server is unavailable")
+
+      expect { generate(:run_ps, "Get-Thing") }
+        .to raise_error(/Expected JSON.*RPC server is unavailable/m)
+    end
+
     context "with dry_run enabled" do
       let(:driver_config) { { dry_run: true } }
 
@@ -324,7 +331,13 @@ RSpec.describe Kitchen::Driver::PowerShellScripts do
     it "mounts an ISO by id" do
       driver.send(:config)[:iso_path] = 'C:\iso\tools.iso'
 
-      expect(generate(:mount_vm_iso)).to include(%{mount-vmiso -id "vm-0001" -Path C:\\iso\\tools.iso})
+      expect(generate(:mount_vm_iso)).to include(%{mount-vmiso -id "vm-0001" -Path "C:\\iso\\tools.iso"})
+    end
+
+    it "quotes the ISO path so a path containing a space stays one argument" do
+      driver.send(:config)[:iso_path] = 'C:\ISO Files\tools.iso'
+
+      expect(generate(:mount_vm_iso)).to include(%{-Path "C:\\ISO Files\\tools.iso"})
     end
 
     describe "#copy_vm_file_ps" do

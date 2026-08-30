@@ -193,7 +193,16 @@ module Kitchen
         raise "Failed: #{sh.stderr}" if sh.exit_status != 0
 
         stdout = sanitize_stdout(sh.stdout)
-        JSON.parse(stdout) if stdout.length > 2
+        return if stdout.length <= 2
+
+        begin
+          JSON.parse(stdout)
+        rescue JSON::ParserError => e
+          # A bare JSON::ParserError names an offset in a string the user never
+          # sees, which is useless for working out what the host actually said.
+          raise "Expected JSON from the Hyper-V host but could not parse its " \
+                "output (#{e.message}). The host returned:\n#{stdout}"
+        end
       end
 
       # Strip the interactive prompt lines PowerShell interleaves with output,
@@ -372,11 +381,14 @@ module Kitchen
 
       # Script that attaches the configured ISO to the VM's DVD drive.
       #
+      # The path is quoted: unquoted, PowerShell splits an ISO path containing
+      # a space into two arguments and binds only the first to -Path.
+      #
       # @return [String] PowerShell source
       # @api private
       def mount_vm_iso
         <<-MOUNTISO
-          mount-vmiso -id "#{@state[:id]}" -Path #{config[:iso_path]}
+          mount-vmiso -id "#{@state[:id]}" -Path "#{config[:iso_path]}"
         MOUNTISO
       end
 

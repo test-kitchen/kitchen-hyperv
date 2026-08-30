@@ -211,20 +211,37 @@ Function Set-VMNetworkConfiguration {
 
 function Get-VmDetail {
     [cmdletbinding()]
-    param($Id)
+    param(
+        $Id,
+
+        # Longest to wait for the guest to report an IPv4 address. Without a
+        # bound, a VM whose network never comes up leaves `kitchen create`
+        # hanging silently for as long as the user is willing to wait.
+        [int]$TimeoutSeconds = 600
+    )
 
     Get-VM -Id $Id |
         ForEach-Object {
         $vm = $_
-        do {
+        $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+
+        # Keep the address the wait found rather than asking again: Get-VmIP
+        # sleeps 10 seconds per call, so a second call cost every create an
+        # extra 10 seconds and could return a different adapter's address.
+        $ipAddress = Get-VmIP $vm
+
+        while (-not $ipAddress) {
+            if ((Get-Date) -gt $deadline) {
+                throw "Timed out after $TimeoutSeconds seconds waiting for virtual machine '$($vm.Name)' to report an IP address. Check that the VM booted and that its network adapter is connected to a switch with DHCP."
+            }
             Start-Sleep -Seconds 1
+            $ipAddress = Get-VmIP $vm
         }
-        while (-not (Get-VmIP $vm))
 
         [pscustomobject]@{
             Name = $vm.name
             Id = $vm.ID
-            IpAddress = (Get-VmIP $vm)
+            IpAddress = $ipAddress
         }
     }
 }
