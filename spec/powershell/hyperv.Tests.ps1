@@ -380,6 +380,50 @@ Describe 'Get-VmDetail' {
         $detail.Id | Should -Be 'vm-1'
         $detail.IpAddress | Should -Be '192.168.1.50'
     }
+
+    It 'asks for the address once when it is already available' {
+        Mock Get-VM { [pscustomobject]@{ Name = 'kitchen'; ID = 'vm-1' } }
+        Mock Get-VmIP { '192.168.1.50' }
+
+        $null = Get-VmDetail -Id 'vm-1'
+
+        # Get-VmIP sleeps 10 seconds per call, so asking twice cost every
+        # create an extra 10 seconds for an address it already had.
+        Should -Invoke Get-VmIP -Exactly -Times 1
+    }
+
+    It 'keeps waiting while the guest has no address yet' {
+        Mock Get-VM { [pscustomobject]@{ Name = 'kitchen'; ID = 'vm-1' } }
+        Mock Start-Sleep
+        $script:calls = 0
+        Mock Get-VmIP {
+            $script:calls++
+            if ($script:calls -ge 3) { '192.168.1.50' }
+        }
+
+        $detail = Get-VmDetail -Id 'vm-1'
+
+        $detail.IpAddress | Should -Be '192.168.1.50'
+        Should -Invoke Start-Sleep -Exactly -Times 2
+    }
+
+    It 'gives up rather than hanging forever when no address ever arrives' {
+        Mock Get-VM { [pscustomobject]@{ Name = 'kitchen'; ID = 'vm-1' } }
+        Mock Get-VmIP { $null }
+        Mock Start-Sleep
+
+        { Get-VmDetail -Id 'vm-1' -TimeoutSeconds 0 } |
+            Should -Throw -ExpectedMessage '*Timed out after 0 seconds*'
+    }
+
+    It 'names the virtual machine in the timeout message' {
+        Mock Get-VM { [pscustomobject]@{ Name = 'kitchen'; ID = 'vm-1' } }
+        Mock Get-VmIP { $null }
+        Mock Start-Sleep
+
+        { Get-VmDetail -Id 'vm-1' -TimeoutSeconds 0 } |
+            Should -Throw -ExpectedMessage "*'kitchen'*"
+    }
 }
 
 Describe 'Get-VmStatus' {
