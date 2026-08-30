@@ -199,7 +199,14 @@ module Kitchen
 
       # Build the status hash Test Kitchen normalizes.
       #
-      # @return [Hash]
+      # @param live [Boolean, nil] whether the virtual machine is running, or
+      #   nil when the driver could not determine it
+      # @param state [String] the lifecycle state to report: "not_created",
+      #   "running", "stopped", or "unknown"
+      # @param message [String] human-readable explanation of the state
+      # @param resource_id [String, nil] the Hyper-V virtual machine id, when
+      #   one is known
+      # @return [Hash] the status data, stamped with a UTC `checked_at` time
       # @api private
       def status_report(live:, state:, message:, resource_id: nil)
         {
