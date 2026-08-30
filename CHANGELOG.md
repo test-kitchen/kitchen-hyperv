@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.12.1](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.12.0...v0.12.1) (2026-08-30)
+
+
+### Bug Fixes
+
+* quote the ISO path, bound the wait for a guest IP, and explain bad host output ([#169](https://github.com/test-kitchen/kitchen-hyperv/issues/169)) ([eac043a](https://github.com/test-kitchen/kitchen-hyperv/commit/eac043ab4b7428a9781fbdd192d52c302e9fe1d9))
+
 ## [0.12.0](https://github.com/test-kitchen/kitchen-hyperv/compare/v0.11.0...v0.12.0) (2026-08-23)
 
 
