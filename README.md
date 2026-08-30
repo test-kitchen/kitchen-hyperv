@@ -6,6 +6,19 @@ A [Test Kitchen](https://github.com/test-kitchen/test-kitchen) driver for [Micro
 
 > This documentation uses [Cinc Workstation](https://cinc.sh/) and the `cinc` commands throughout. Everything here works identically with Chef Workstation — see [Using with Chef](#using-with-chef).
 
+## Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [How instances are created](#how-instances-are-created)
+- [Configuration](#configuration)
+- [Examples](#examples)
+- [Using with Chef](#using-with-chef)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Requirements
 
 - Windows with the Hyper-V role enabled, either locally or on a remote server
@@ -290,6 +303,102 @@ verifier:
 ```
 
 No driver configuration changes are needed.
+
+## Troubleshooting
+
+### First: see what the driver is actually doing
+
+Three commands answer most questions before you start reading error messages:
+
+```sh
+kitchen doctor default-ubuntu-2204   # is Hyper-V reachable and the parent VHD present?
+kitchen diagnose --all               # every driver option as the driver resolved it
+kitchen create -l debug              # the generated PowerShell, and the host's replies
+```
+
+Setting `dry_run: true` on the driver makes it echo each script instead of running it, which is the quickest way to see the exact PowerShell a configuration produces.
+
+### `The term 'Get-VM' is not recognized` or `Access denied`
+
+The Hyper-V PowerShell module is missing, or your shell is not elevated. Both are prerequisites — the Hyper-V cmdlets refuse to run for a non-administrator.
+
+```powershell
+Get-Module -ListAvailable -Name Hyper-V      # is the module installed?
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
+```
+
+Then reboot and reopen your terminal as Administrator. `kitchen doctor` reports both conditions.
+
+### `Failed to find a default VM Switch.`
+
+The driver asked the host for a switch and got nothing back. Either no virtual switch exists, or the name in `vm_switch` does not match one. List what the host has:
+
+```powershell
+Get-VMSwitch | Select-Object Name, SwitchType
+```
+
+Set `vm_switch` to one of those names exactly — the match is on the name, not the switch type. On a fresh Hyper-V install with no switches at all, create one in Hyper-V Manager (Virtual Switch Manager) or with `New-VMSwitch` first.
+
+### `Missing parent_vhd_folder` or `Missing parent_vhd_name`
+
+The driver checks for the parent disk on the local filesystem before it creates anything. Confirm the folder and the file name, including the extension, resolve on the machine running Test Kitchen:
+
+```powershell
+Test-Path 'C:\hyper-v\base-images\ubuntu-2204.vhdx'
+```
+
+Note that `parent_vhd_name` is the file name only — the directory belongs in `parent_vhd_folder`. When `hyperv_server` is set, these paths refer to the *remote* host's filesystem and the local check is skipped, so a typo there surfaces later as a Hyper-V error instead.
+
+### The create hangs, then times out waiting for an IP address
+
+The VM booted but never reported an address. Common causes, in the order worth checking:
+
+- The switch has no DHCP behind it. An internal or private switch gives out no addresses unless you run a DHCP server on it. Use an external switch, or configure a static address with `ip_address`, `subnet` and `gateway`.
+- A generation 2 Linux guest failed to boot because Secure Boot rejected its bootloader. Set `disable_secureboot: true`.
+- The guest's integration services are missing or disabled, so Hyper-V cannot read the address out of the guest. Connect to the VM in Hyper-V Manager and check that it reached a login prompt.
+
+Watching the VM console in Hyper-V Manager while `kitchen create` runs distinguishes "never booted" from "booted but has no address" in a few seconds.
+
+### A generation 2 VM will not boot
+
+Generation 2 VMs boot via UEFI with Secure Boot on, and Hyper-V's default Secure Boot template only trusts Microsoft's bootloaders. Most Linux images need:
+
+```yaml
+driver:
+  vm_generation: 2
+  disable_secureboot: true
+```
+
+Generation 2 also has no IDE and no DVD drive by default; the driver adds one when you set `iso_path` or `boot_iso_path`.
+
+### `Additional disk file already exists`
+
+The driver refuses to overwrite a disk file. This normally means a previous run was interrupted before `kitchen destroy` could clean up. Delete the leftover `.vhdx` under `.kitchen/<instance-name>/`, or give the disk a name unique to the suite.
+
+### `kitchen destroy` says the instance does not exist, but the VM is still there
+
+The instance's state file lost the VM id — usually because `.kitchen/` was deleted, or the VM was created under a different `kitchen.yml`. Test Kitchen tracks VMs by id, so it can no longer find it. Remove it by hand:
+
+```powershell
+Get-VM | Where-Object Name -like 'default-*' | Stop-VM -Force -TurnOff -PassThru | Remove-VM -Force
+```
+
+Then delete the leftover differencing disks under `.kitchen/`.
+
+### Errors connecting to a remote `hyperv_server`
+
+The driver reaches a remote host over WinRM, so the host has to be configured for it and to trust you:
+
+```powershell
+Enable-PSRemoting -Force                      # on the Hyper-V host
+Test-WSMan -ComputerName hyperv01.example.com # from the machine running Test Kitchen
+```
+
+If the connection is refused over HTTPS, check that `hyperv_ssl: true` matches a WinRM HTTPS listener on the host. If it fails certificate validation, either install a certificate the client trusts and keep `hyperv_insecure: false`, or accept the self-signed certificate with the default `hyperv_insecure: true` — see the note under [Remote Hyper-V host](#remote-hyper-v-host) for what that costs you.
+
+### An ISO or file copy does nothing
+
+`copy_vm_files` needs the Hyper-V guest service interface, which is off by default. Set `enable_guest_services: true` as well. The copy also happens only after the guest is reachable, so it will not run if the create never gets that far.
 
 ## Contributing
 
